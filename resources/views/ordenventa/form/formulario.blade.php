@@ -4,6 +4,28 @@
 
 			@if($swmodificar==true)
 				<div class="row">
+					<div class="col-sm-3">
+						<div class="form-group">
+							<label class="control-label">Codigo Shopify</label>
+							<div class="col-sm-12">
+
+									<input  type="text"
+													id="codigo_shopify" name='codigo_shopify' 
+													value="@if(isset($registro)){{old('codigo_shopify' ,$registro->codigo_shopify)}}@else{{old('codigo_shopify')}}@endif"
+													value="{{ old('codigo_shopify') }}"                         
+													placeholder="Codigo Shopify"												
+													required = ""
+													autocomplete="off" class="form-control input-sm" data-aw="3"/>
+
+									@include('error.erroresvalidate', [ 'id' => $errors->has('codigo_shopify')  , 
+																											'error' => $errors->first('codigo_shopify', ':message') , 
+																											'data' => '3'])
+
+							</div>
+						</div>
+					</div>	
+				</div>				
+				<div class="row">
 					
 
 					<div class="col-sm-5">
@@ -74,6 +96,29 @@
 					</div>
 				</div>
 			@else
+				<div class="row">
+					<div class="col-sm-3">
+						<div class="form-group">
+							<label class="control-label">Codigo Shopify</label>
+							<div class="col-sm-12">
+
+									<input  type="text"
+													id="codigo_shopify" name='codigo_shopify' 
+													value="@if(isset($registro)){{old('codigo_shopify' ,$registro->codigo_shopify)}}@else{{old('codigo_shopify')}}@endif"
+													value="{{ old('codigo_shopify') }}"                         
+													placeholder="Codigo Shopify"												
+													required = ""
+													disabled 
+													autocomplete="off" class="form-control input-sm" data-aw="3"/>
+
+									@include('error.erroresvalidate', [ 'id' => $errors->has('codigo_shopify')  , 
+																											'error' => $errors->first('codigo_shopify', ':message') , 
+																											'data' => '3'])
+
+							</div>
+						</div>
+					</div>	
+				</div>
 				<div class="row">
 					
 
@@ -150,47 +195,8 @@
 
 
 
-			<div class="col-sm-12">
-					<table id='listadetalleventa'  class="table table-striped table-borderless" >
-							<thead>
-								<tr>
-										<th>ID</th>
-										<th>PRODUCTO</th>
-										<th>TIPO ORO</th>
-										<th>CANTIDAD</th>
-										
-										<th>ACCION</th> 
-								</tr>
-							</thead>
-							<tbody>
-							@if(isset($listadetalle))
-								@foreach($listadetalle as $index => $item)
-									<tr data_detallecompra_id = "{{$item->id}}" class='activo{{$item->activo}}'>
-										<td>{{$index + 1 }}</td>
-										<td>{{$item->producto_descripcion}}</td>
-										<td>{{$item->tipooro_descripcion}}</td>
-										<td>{{number_format($item->cantidad, 2)}}</td>
-										
-										<td class="rigth">
-											<div class="btn-group btn-hspace">
-												<button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle" @if($registro->estado_id != '1CIX00000003') disabled @endif>Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
-												<ul role="menu" class="dropdown-menu pull-right">
-													<li>
-														<a href="{{ url('/quitar-detalle-ventas/'.$idopcion.'/'.Hashids::encode(substr($item->id, -8))) }}">
-															Quitar
-														</a>  
-													</li>
-												</ul>
-											</div>
-										</td>
-									</tr>                    
-								@endforeach                
-							@endif
-							</tbody>
-					<tfooter>
-							
-					</tfooter>
-					</table>          
+			<div class="col-sm-12 contenedor_ov_detalle">
+					@include('ordenventa.ajax.adetalleov')        
 			</div>
 
 
@@ -222,4 +228,15 @@
 	</div>
 </div>
 
-
+@if(isset($ajax))
+  <script type="text/javascript">
+    $(document).ready(function(){
+      App.formElements();
+      $('.importe').inputmask({ 'alias': 'numeric', 
+      'groupSeparator': ',', 'autoGroup': true, 'digits': 2, 
+      'digitsOptional': false, 
+      'prefix': '', 
+      'placeholder': '0'});
+    });
+  </script>
+@endif

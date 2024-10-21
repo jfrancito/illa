@@ -13,13 +13,13 @@
     <div class="row">
       <div class="col-md-12">
         <div class="panel panel-default panel-border-color panel-border-color-primary">
-          <div class="panel-heading panel-heading-divider">Modificar Esquema Productos
+          <div class="panel-heading panel-heading-divider">Margen Orden Venta
 
-            <span class="panel-subtitle">Modificar Esquema de Productos nueva Orden Venta</span>
+            <span class="panel-subtitle">Margen Orden Venta</span>
           </div>
           <div class="panel-body">
                   <div class='formconsulta'>
-                    @include('ordenventa.form.formularioesquemaov',['swmodidicar'=>true])
+                    @include('ordenventa.form.formulariomargenov',['swmodidicar'=>true])
                     <input type="hidden" name="ordenventa_id" id="ordenventa_id" value='{{$idregistro}}'>
                     <input type="hidden" name="idopcion" id="idopcion" value='{{$idopcion}}'>
                     

@@ -5,6 +5,7 @@
       {{-- <th>Lote</th> --}}
       {{-- <th>Tipo Comprobante</th> --}}
       {{-- <th>Serie</th> --}}
+      <th>Codigo Shopify</th>
       <th>Codigo</th>
       <th>Cliente</th>
       <th>Fecha</th>
@@ -22,6 +23,7 @@
         {{-- <td>{{$item->lote}}</td> --}}
         {{-- <td>{{$item->tipo_comprobante_nombre}}</td> --}}
         {{-- <td>{{$item->serie}}</td> --}}
+        <td>{{$item->codigo_shopify}}</td>
         <td>{{$item->codigo}}</td>
         <td>{{$item->cliente_nombre}}</td>
         <td>{{date_format(date_create($item->fecha),'d-m-Y')}}</td>        
@@ -65,7 +67,7 @@
                 </a>  
               </li>
               <li @if($item->estado_id == '1CIX00000003') hidden @endif>
-                <a href="{{ url('/orden-ventas-esquema-producto/'.$idopcion.'/'.Hashids::encode(substr($item->id, -8))) }}">
+                <a href="{{ url('/orden-ventas-margen-producto/'.$idopcion.'/'.Hashids::encode(substr($item->id, -8))) }}">
                   Margen
                 </a>  
               </li>

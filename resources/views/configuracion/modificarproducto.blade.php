@@ -7,16 +7,25 @@
 @stop
 @section('section')
 
-<div class="be-content">
+<div class="be-content producto">
   <div class="main-content container-fluid">
 
     <!--Basic forms-->
     <div class="row">
       <div class="col-md-12">
         <div class="panel panel-default panel-border-color panel-border-color-primary">
-          <div class="panel-heading panel-heading-divider">Producto<span class="panel-subtitle">Modificar Producto : {{$producto->nombre_razonsocial}}</span></div>
+          <div class="panel-heading panel-heading-divider">Producto
+          <div class="tools tooltiptop">
+            <a href="#" class="tooltipcss opciones agregaproductogema"
+              data_producto_id = '{{$producto->id}}'>                            
+              <span class="tooltiptext">Agregar gema</span>
+              <span class="icon mdi mdi-plus-circle-o"></span>              
+            </a>
+          </div>
+          <input type="hidden" name="idopcion" id='idopcion' value='{{$idopcion}}'>
+          <span class="panel-subtitle">Modificar Producto : {{$producto->nombre_razonsocial}}</span></div>
           <div class="panel-body">
-            <form method="POST" action="{{ url('/modificar-productos/'.$idopcion.'/'.Hashids::encode(substr($producto->id, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed formagregarproducto">
+            <form method="POST" id='formagregarproducto' action="{{ url('/modificar-productos/'.$idopcion.'/'.Hashids::encode(substr($producto->id, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed formagregarproducto">
                   {{ csrf_field() }}
               @include('configuracion.form.fproducto')
             </form>
@@ -24,9 +33,8 @@
         </div>
       </div>
     </div>
-
-
   </div>
+  @include('configuracion.modal.mproductogema')
 </div>  
 
 
@@ -52,6 +60,13 @@
     <script src="{{ asset('public/lib/jquery.niftymodals/dist/jquery.niftymodals.js') }}" type="text/javascript"></script>
 
     <script type="text/javascript">
+
+      $.fn.niftyModal('setDefaults',{
+        overlaySelector: '.modal-overlay',
+        closeSelector: '.modal-close',
+        classAddAfterOpen: 'modal-show',
+      });
+
       $(document).ready(function(){
         //initialize the javascript
         App.init();
@@ -63,6 +78,9 @@
         'digitsOptional': false, 
         'prefix': '', 
         'placeholder': '0'});
+
+        
+
 
 
       });

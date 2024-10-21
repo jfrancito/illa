@@ -444,5 +444,6 @@ function actualizar_tabla_cotizacion(data_cotizacion_id,data_detalle_cotizacion_
             error500(data);
         }
     });
+
 }
 

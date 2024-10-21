@@ -227,7 +227,7 @@
               @endif
               </tbody>
           <tfooter>
-              <tr >
+              <tr>
                 <td colspan="6" class="text-right"><b>TOTAL : </b></td>
                 
                   <td>

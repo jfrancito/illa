@@ -190,6 +190,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/agregar-productos/{idopcion}', 'ConfiguarionController@actionAgregarProductos');
 	Route::any('/modificar-productos/{idopcion}/{idproducto}', 'ConfiguarionController@actionModificarProducto');
 	Route::any('/ajax-cargar-sub-categorias-productos', 'ConfiguarionController@actionAjaxSubCategoriasProducto');
+	Route::any('/ajax-modal-producto-gema', 'ConfiguarionController@actionAjaxModalProductoGema');
+	Route::any('/guardar-producto-gema/{idopcion}/{idproducto}', 'ConfiguarionController@actionAgregarProductoGema');	
+	Route::any('/quitar-producto-gema/{idopcion}/{idproductogema}', 'ConfiguarionController@actionQuitarProductoGema');	
 
 	//GESTION DE COMPRAS
 	Route::any('/gestion-de-compras/{idopcion}', 'CompraController@actionListarCompras');
@@ -222,6 +225,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-genera-nota-pedido-ventas', 'VentaController@actionGeneraNotaPedidoAjax');
 	Route::any('/extornar-ventas/{idopcion}/{idventa}', 'VentaController@actionExtornarVentas');
 	Route::any('/pdf-ventas/{idventa}', 'VentaController@actionPdfVentas');
+
 
 
 
@@ -319,10 +323,19 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-detalle-orden-venta', 'GestionOrdenVentaController@actionAjaxModalDetalleOrdenVenta');
 	Route::any('/guardar-detalle-orden-ventas/{idopcion}/{idregistro}', 'GestionOrdenVentaController@actionAgregarDetalleOrdenVentas');
 	Route::any('/ajax-gestion-de-orden-ventas-entrefechas', 'GestionOrdenVentaController@actionAjaxOrdenVentaEntreFechas');
+	Route::any('/ajax-actualizar-envio-orden-venta', 'GestionOrdenVentaController@actionAjaxActualizarEnvioOrdenVenta');
+	Route::any('/ajax-actualizar-descuento-orden-venta', 'GestionOrdenVentaController@actionAjaxActualizarDescuentoOrdenVenta');
+	Route::any('/ajax-actualizar-seguro-orden-venta', 'GestionOrdenVentaController@actionAjaxActualizarSeguroOrdenVenta');
 
 	Route::any('/aprobar-orden-ventas/{idopcion}/{idregistro}', 'GestionOrdenVentaController@actionAprobarOrdenVenta');
 	Route::any('/orden-ventas-esquema-producto/{idopcion}/{idregistro}', 'GestionOrdenVentaController@actionOrdenVentaEsquemaProductos');
-	Route::any('/modificar-orden-ventas-esquema-productos/{idopcion}/{idregistro}', 'GestionOrdenVentaController@actionOrdenVentaModificarEsquemaProductos');
+	Route::any('/modificar-orden-ventas-esquema-productos/{idopcion}/{idesquemaproducto}/{idordenventa}', 'GestionOrdenVentaController@actionOrdenVentaModificarEsquemaProductos');
+	Route::any('/orden-ventas-margen-producto/{idopcion}/{idregistro}', 'GestionOrdenVentaController@actionOrdenVentaMargenProductos');
+	Route::any('/modificar-orden-ventas-margen-productos/{idopcion}/{idordenventa}', 'GestionOrdenVentaController@actionOrdenVentaModificarMargenProductos');
+
+
+	Route::any('/ajax-modal-detalle-gema-esquema', 'GestionOrdenVentaController@actionAjaxModalDetalleGemaEsquema');
+	Route::any('/guardar-detalle-orden-gema/{idopcion}/{esquema_id}/{detalleesquema_id}/{ordenventa_id}', 'GestionOrdenVentaController@actionGuardaretalleGemaEsquema');
 
 	// Route::any('/pagar-caja-compra/{idopcion}/{idregistro}', 'GestionCajaController@actionPagarCajaCompra');
 	// Route::any('/ajax-modal-detalle-pago-compra', 'GestionCajaController@actionAjaxModalDetallePagoCompra');

@@ -21,6 +21,8 @@ use App\Modelos\OrdenVenta;
 use App\Modelos\DetalleOrdenVenta;
 use App\Modelos\EsquemaProducto;
 use App\Modelos\DetalleEsquemaProducto;
+use App\Modelos\ProductoGema;
+use App\Modelos\DetalleOrdenVenta_ProductoGema;
 use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
@@ -33,12 +35,101 @@ use NumeroALetras;
 use PDF;
 use App\Traits\GeneralesTraits;
 use App\Traits\ConfiguracionTraits;
+use App\Traits\OrdenVentaTraits;
 
 
 class GestionOrdenVentaController extends Controller
 {
 	use GeneralesTraits;
 	use ConfiguracionTraits;
+	use OrdenVentaTraits;
+
+	
+	public function actionAjaxModalDetalleGemaEsquema(Request $request)
+	{
+
+
+		$gema_esquema_id 	 		= 	$request['gema_esquema_id'];
+		$idopcion 	 				= 	$request['idopcion'];
+		$esquema_id 	 			= 	$request['esquema_id'];
+		$ordenventa_id 	 			= 	$request['ordenventa_id'];
+
+
+
+		$esquemaproducto 			=	EsquemaProducto::where('id','=',$esquema_id)->first();
+		$detesquemaproducto 		=	DetalleEsquemaProducto::where('id','=',$gema_esquema_id)->where('activo','=',1)->first();
+		$combo_origen_gema			=   array('' => "Seleccione Origen") + Categoria::where('tipo_categoria','=','TIPO_ORIGEN_GEMA')->pluck('descripcion','id')->toArray();// + $datos;
+		$select_origen_gema			=   $detesquemaproducto->origen_id;
+
+		//dd($idopcion);
+
+		
+		return View::make('ordenventa/modal/ajax/madetallegema',
+						 [		 	
+						 	'gema_esquema_id' 		=> $gema_esquema_id,
+						 	'esquema_id' 			=> $esquema_id,
+						 	'ordenventa_id' 		=> $ordenventa_id,
+
+						 	'esquemaproducto' 		=> $esquemaproducto,
+						 	'detesquemaproducto' 	=> $detesquemaproducto,
+						 	'combo_origen_gema' 	=> $combo_origen_gema,
+						 	'select_origen_gema' 	=> $select_origen_gema,
+						 	'idopcion' 				=> $idopcion,
+						 	'ajax' 					=> true,						 	
+						 ]);
+	}
+
+
+
+	public function actionGuardaretalleGemaEsquema($idopcion,$esquema_id,$detalleesquema_id,$idordenventa,Request $request)
+	{
+
+		if($_POST)
+		{
+			
+			try {
+					DB::beginTransaction();
+					/******************************/
+
+					$origen_id						=	$request['origen_id'];
+					$cantidad						=	(float)$request['cantidad'];
+					$precio							=	(float)$request['precio'];
+					$costo_total 					=	$cantidad * $precio;
+
+					$origen 						=	Categoria::where('id','=',$origen_id)->first();
+					DetalleEsquemaProducto::where('id','=',$detalleesquema_id)
+										->update(
+											[
+												'cantidad'=>$cantidad,
+												'costo_unitario'=>$precio,
+												'costo_total'=>$costo_total,
+												'origen_id'=>$origen->id,
+												'origendescripcion'=>$origen->descripcion,
+												'fecha_mod'=>$this->fechaactual,
+												'usuario_mod'=>Session::get('usuario')->id,
+											]
+										);
+
+					$esquema 					   =    EsquemaProducto::where('id','=',$esquema_id)->first();
+
+					$this->ov_calculo_total_gema($esquema_id);
+					$this->ov_calculo_total_orden_venta($esquema->ordenventa_id);
+
+					DB::commit();
+				
+			} catch (Exception $ex) {
+				DB::rollback();
+				$msj =$this->ge_getMensajeError($ex);
+				return Redirect::to('orden-ventas-esquema-producto/'.$idopcion.'/'.$idordenventa)->with('errorurl', $msj);
+			}
+			/******************************/
+
+            Session::flash('tab', $esquema_id);
+			return Redirect::to('/orden-ventas-esquema-producto/'.$idopcion.'/'.$idordenventa)->with('bienhecho', 'Registro guardado realizado con exito');
+		}
+
+	}
+
 
 	public function actionListarOrdenesVenta($idopcion)
 	{
@@ -109,16 +200,20 @@ class GestionOrdenVentaController extends Controller
 					$fecha                 		=   $request['fecha'];
 					$idregistro              	=   $this->funciones->getCreateIdMaestra('ordenventas');
 					$codigo                     =   $this->funciones->getCreateCodCorrelativo('ordenventas',8);
+					$codigo_shopify             =   $request['codigo_shopify'];
 
-					$tipocambio					=	TipoCambio::whereDate('fecha','<=',$fecha)->orderby('fecha','desc')->first();
+					$tipocambio					=	$this->ge_tipo_cambio();
+
+
 					$cabecera                   =   new OrdenVenta();
 					$cabecera->id               =   $idregistro;
 					$cabecera->codigo           =   $codigo;
+					$cabecera->codigo_shopify   =   $codigo_shopify;
 					$cabecera->moneda_id   		=   $moneda_id;
 					$cabecera->moneda_nombre   	=   $moneda->descripcion;
 					$cabecera->cliente_id       =   $cliente_id;
 					$cabecera->cliente_nombre   =   $cliente->nombre_razonsocial;
-					$cabecera->tc				=	$tipocambio->venta;
+					$cabecera->tc				=	$tipocambio;
 
 					$cabecera->estado_id 	   			=   '1CIX00000003';
 					$cabecera->estado_descripcion 	   	=   'GENERADO';	
@@ -135,7 +230,7 @@ class GestionOrdenVentaController extends Controller
 				
 			} catch (Exception $ex) {
 				DB::rollback();
-				  $msj =$this->ge_getMensajeError($ex);
+				 $msj =$this->ge_getMensajeError($ex);
 				return Redirect::to('/gestion-orden-venta/'.$idopcion)->with('errorurl', $msj);
 			}
 			/******************************/
@@ -243,20 +338,15 @@ class GestionOrdenVentaController extends Controller
 		$idopcionproducto 			=	($opcionproducto) ? Hashids::encode(substr($opcionproducto->id,-8)) : '';
 
 		$select_producto			=	'';
-		$combo_producto	 			=	[''=>'SELECCIONE PRODUCTO']+Producto::where('indproduccion','=',1)->where('activo','=',1)->pluck('descripcion','id')->toArray();
-		
-		$select_tipo_oro			=	'';
-		$combo_tipo_oro	 			=	[''=>'SELECCIONE TIPO ORO']+Producto::where('subcategoria_nombre','=','ORO')->where('activo','=',1)->pluck('descripcion','id')->toArray();
-		
+		$combo_producto	 			=	[''=>'SELECCIONE PRODUCTO']+Producto::where('indproduccion','=',1)->where('activo','=',1)->pluck('descripcion','id')->toArray();		
+				
 		return View::make('ordenventa/modal/ajax/madetalleregistro',
 						 [		 	
 						 	'registro' 				=> $registro,
 						 	'registro_id' 			=> $registro_id,
 						 	'cliente_nombre' 		=> $cliente_nombre,
 						 	'select_producto' 		=> $select_producto,
-						 	'combo_producto' 		=> $combo_producto,
-						 	'select_tipo_oro' 		=> $select_tipo_oro,
-						 	'combo_tipo_oro' 		=> $combo_tipo_oro,
+						 	'combo_producto' 		=> $combo_producto,						 	
 						 	'idopcion' 				=> $idopcion,
 						 	'idopcionproducto'		=> $idopcionproducto,
 						 	'ajax' 					=> true,						 	
@@ -270,34 +360,72 @@ class GestionOrdenVentaController extends Controller
 	    if($validarurl <> 'true'){return $validarurl;}
 	    /******************************************************/
 	    $registro_id = $this->funciones->decodificarmaestra($idregistro);	
-	    $producto_id		=	$request['producto_id'];	
-	    $tipooro_id			=	$request['tipooro_id'];	
+
+	    try {
+					DB::beginTransaction();
+
+				    $producto_id		=	$request['producto_id'];	
+				    					
+					$cantidad				 				= 	floatval(str_replace(",","",$request['cantidad']));
+					$producto	 							= 	Producto::where('id','=',$producto_id)->first();				
+					$total	 								= 	$cantidad*$producto->precio_venta;		
+
+					$cabecera						=	OrdenVenta::find($registro_id);
 					
-		$cantidad				 				= 	floatval(str_replace(",","",$request['cantidad']));
-		$producto	 							= 	Producto::where('id','=',$producto_id)->first();				
-		$tipooro	 							= 	Producto::where('id','=',$tipooro_id)->first();				
+					$iddetalle 						=   $this->funciones->getCreateIdMaestra('detalleordenventas');
+					
+					$detalle						=	new DetalleOrdenVenta;
+					$detalle->id					=	$iddetalle;
+					$detalle->ordenventa_id			=	$registro_id;
+					$detalle->producto_id			=	$producto->id;
+					$detalle->producto_descripcion	=	$producto->descripcion;
+					$detalle->indproduccion			=	$producto->indproduccion;		
+					$detalle->cantidad				=	$cantidad;
+					$detalle->preciounitario		=	$producto->precio_venta;
+					$detalle->total					=	$total;
+					$detalle->tc					=	$cabecera->tc;
+					$detalle->total_mn				=	$total*$cabecera->tc;
+					$detalle->tipo_oro_id			=	$producto->tipo_oro_id;
+					$detalle->tipo_oro_nombre		=	$producto->tipo_oro_nombre;
+					$detalle->cantidad_oro			=	$producto->cantidad_oro;
+					$detalle->fecha_crea 	 		=	$this->fechaactual;
+					$detalle->usuario_crea 			=	Session::get('usuario')->id;
+					$detalle->save();
 
-		$iddetalle 						=   $this->funciones->getCreateIdMaestra('detalleordenventas');
-		
-		$detalle						=	new DetalleOrdenVenta;
-		$detalle->id					=	$iddetalle;
-		$detalle->ordenventa_id			=	$registro_id;
-		$detalle->producto_id			=	$producto->id;
-		$detalle->producto_descripcion	=	$producto->descripcion;
-		$detalle->indproduccion			=	$producto->indproduccion;
-		
-		$detalle->tipooro_id			=	$tipooro->id;
-		$detalle->tipooro_descripcion	=	$tipooro->descripcion;
 
-		$detalle->cantidad				=	$cantidad;
-		$detalle->fecha_crea 	 		=	$this->fechaactual;
-		$detalle->usuario_crea 			=	Session::get('usuario')->id;
-		$detalle->save();
+					$listaprodgemas 				= 	ProductoGema::where('producto_id','=',$producto_id)
+														->where('activo','=',1)->get();
 
-		$cabecera						=	OrdenVenta::find($registro_id);
-		$cabecera->fecha_mod			=	$this->fechaactual;
-		$cabecera->usuario_mod			=	Session::get('usuario')->id;
-		$cabecera->save();			
+					foreach($listaprodgemas as $index => $gema){						
+						$iddov_gemas						=	$this->funciones->getCreateIdMaestra('detalleordenventas_productogemas');
+												
+						$ddov_gemas							=	new DetalleOrdenVenta_ProductoGema();
+						$ddov_gemas->id						=	$iddov_gemas;						
+						$ddov_gemas->ordenventa_id			=	$registro_id;
+						$ddov_gemas->detalleordenventa_id	=	$iddetalle;
+						$ddov_gemas->producto_id 	     	=   $gema->producto_id;
+						$ddov_gemas->producto_nombre 		=   $gema->producto_nombre;			
+						$ddov_gemas->gema_id 	   			=   $gema->gema_id;
+						$ddov_gemas->gema_nombre			=   $gema->gema_nombre;								
+						$ddov_gemas->cantidad				=   $gema->cantidad;								
+						$ddov_gemas->fecha_crea       		=   $this->fechaactual;
+						$ddov_gemas->usuario_crea     		=   Session::get('usuario')->id;
+						$ddov_gemas->save();
+					}
+
+					$cabecera->venta 	   			=   $cabecera->venta+$total;	
+					$cabecera->venta_mn 	   		=   $cabecera->venta_mn+($total*$cabecera->tc);	
+					$cabecera->fecha_mod			=	$this->fechaactual;
+					$cabecera->usuario_mod			=	Session::get('usuario')->id;
+					$cabecera->save();	
+
+					DB::commit();
+				
+		} catch (Exception $ex) {
+			DB::rollback();
+			$msj =$this->ge_getMensajeError($ex);
+			return Redirect::to('/modificar-orden-ventas/'.$idopcion.'/'.$idregistro)->with('errorurl', $msj);
+		}		
 
 		// $idregistroen								= 	Hashids::encode(substr($idventa, -8));
 		return Redirect::to('/modificar-orden-ventas/'.$idopcion.'/'.$idregistro)->with('bienhecho', 'Producto '.$producto->descripcion.' registrado con exito');
@@ -339,34 +467,106 @@ class GestionOrdenVentaController extends Controller
 		$registro_id = $this->funciones->decodificarmaestra($idregistro);
 		View::share('titulo','Listar Orden Venta');
 		try {
+					
 					DB::beginTransaction();
 					/******************************/
 					$usuario                    	=   User::where('id',Session::get('usuario')->id)->first();
+
+
 					$cabecera						=	OrdenVenta::find($registro_id);
 					$cabecera->estado_id 	   		=   '1CIX00000004';
 					$cabecera->estado_descripcion	=   'EMITIDO';	
+					$cabecera->descuento_shopify	=   $cabecera->venta*2/100;	
 					$cabecera->fecha_mod       		=   $this->fechaactual;
 					$cabecera->usuario_mod     		=   Session::get('usuario')->id;
 					$cabecera->save();
-					$listadetalle = DetalleOrdenVenta::where('ordenventa_id','=',$registro_id)->get();
+
+
+
+					$listadetalle 					= 	DetalleOrdenVenta::where('ordenventa_id','=',$registro_id)->where('activo','=','1')->get();
 
 					foreach($listadetalle as $index => $detalle){
 						//crear un esquema de producto x cada detalle
 						$idregistro						=	$this->funciones->getCreateIdMaestra('esquemaproducto');
 						$cod_registro 					=	$this->funciones->getCreateCodCorrelativo('esquemaproducto',8);
 						$producto						=	Producto::where('id','=',$detalle->producto_id)->first();
-						$tipooro						=	Producto::where('id','=',$detalle->tipooro_id)->where('activo','=',1)->first();
+						$tipooro						=	Producto::where('id','=',$detalle->tipo_oro_id)->first();
+						$cantidad_total_gemas			=	0;
+						$costo_total_gemas 				=	0;
+
+
+						$precio_x_gramo 				=	$this->ov_precio_gramo_ultima_ov($detalle->producto_id);
+						$costo_total_oro 				=	$precio_x_gramo*$detalle->cantidad_oro;
+						$costo_total_engaste 			=	$this->ov_total_engaste_ultima_ov($detalle->producto_id);
+
 						$esquema						=	new EsquemaProducto();
 						$esquema->id					=	$idregistro;
 						$esquema->codigo				=	$cod_registro;
 						$esquema->ordenventa_id			=	$registro_id;
+						$esquema->detalleordenventa_id	=	$detalle->id;
 						$esquema->producto_id			=	$producto->id;
 						$esquema->producto_descripcion	=	$producto->descripcion;
 						$esquema->tipooro_id			=	$tipooro->id;
 						$esquema->tipooro_descripcion	=	$tipooro->descripcion;
+						$esquema->gramos				=	$detalle->cantidad_oro;
+						$esquema->precio_x_gramo		=	$precio_x_gramo;
+						$esquema->costo_total_oro		=	$costo_total_oro;
+						$esquema->precio_total_engaste	=	$costo_total_engaste;
+						$esquema->cantidad				=	$detalle->cantidad;
+						$esquema->precio_venta			=	$detalle->preciounitario;
 						$esquema->fecha_crea       		=   $this->fechaactual;
 						$esquema->usuario_crea     		=   Session::get('usuario')->id;
 						$esquema->save();
+
+						$gemasproducto 					=	DetalleOrdenVenta_ProductoGema::where('producto_id','=',$detalle->producto_id)
+															->where('ordenventa_id','=',$registro_id)->get();
+
+
+						//dd($gemasproducto);
+
+						foreach($gemasproducto as $index2 => $detalle2){
+
+
+
+							$costo_unitario 				=	$this->ov_costo_unitario_gemas_ov($detalle2->gema_id);
+							$costo_total 					=	$detalle2->cantidad*$costo_unitario;
+							$cantidad_total_gemas 			=	$cantidad_total_gemas + $detalle2->cantidad;
+							$costo_total_gemas 				=	$costo_total_gemas + $costo_total;
+
+							$idregistrod					=	$this->funciones->getCreateIdMaestra('detalleesquemaproducto');
+							$detalle						=	New DetalleEsquemaProducto();
+							$detalle->id            		=   $idregistrod;
+							$detalle->ordenventa_id			=	$registro_id;
+
+							$detalle->esquemaproducto_id	=	$idregistro;
+							$detalle->origen_id				=	'TOGE00000001';
+							$detalle->origendescripcion		=	'PROVEEDOR';
+							$detalle->tipo_id				=	$detalle2->gema_id;
+							$detalle->tipodescripcion		=	$detalle2->gema_nombre;
+							$detalle->cantidad				=	(float)$detalle2->cantidad;
+							$detalle->costo_unitario		=	(float)$costo_unitario;
+							$detalle->costo_total			=	(float)$costo_total;
+							$detalle->usuario_crea     		=   Session::get('usuario')->id;
+							$detalle->fecha            		=   date('d-m-Y');
+							$detalle->fecha_mod       		=   $this->fechaactual;
+							$detalle->usuario_mod     		=   Session::get('usuario')->id;
+							$detalle->save();
+
+
+						}
+
+						$costo_unitario 					=	$costo_total_oro + $costo_total_gemas + $costo_total_engaste;
+						EsquemaProducto::where('id','=',$idregistro)
+											->update(
+												[
+													'cantidad_total_gemas'=>$cantidad_total_gemas,
+													'costo_total_gemas'=>$costo_total_gemas,
+													'costo_unitario'=>$costo_unitario,
+													'costo_unitario_igv'=>$costo_unitario,
+												]
+											);
+						$this->ov_calculo_total_orden_venta($registro_id);
+
 					}
 
 					DB::commit();
@@ -395,11 +595,21 @@ class GestionOrdenVentaController extends Controller
 		/******************************/
 		$usuario			=	User::where('id',Session::get('usuario')->id)->first();
 		$ordenventa			=	OrdenVenta::find($registro_id);
-		$esquema 			=	
-		// $listaesquemas 		=	EsquemaProducto::where('ordenventa_id','=',$registro_id)->where('activo','=',1)->get();
-		$registro 			=	EsquemaProducto::where('ordenventa_id','=',$registro_id)->where('activo','=',1)->first();
+		$listadetalle		=	DetalleOrdenVenta::where('activo','=',1)
+								->where('ordenventa_id','=',$registro_id)
+								->orderby('id','asc')
+								->orderby('producto_descripcion','asc')
+								->get();
 
-		
+		$lregistro 			=	EsquemaProducto::where('ordenventa_id','=',$registro_id)->where('activo','=',1)->get();
+		$activo_esquema 	=	EsquemaProducto::where('ordenventa_id','=',$registro_id)->where('activo','=',1)->first();
+        
+		$tab 				=	$activo_esquema->id;
+        if(Session::has('tab')){
+            $tab           =   Session::get('tab');
+        }
+
+
 		$combo_gemas		=   array('' => "Seleccione Gema") + Producto::where('subcategoria_nombre','=','GEMAS')->pluck('descripcion','id')->toArray();// + $datos;
 		$select_gemas		=   '';
 		$tipocambio			=   TipoCambio::where('fecha','<=',date('d-m-Y'))->orderby('fecha','desc')->first();
@@ -408,15 +618,19 @@ class GestionOrdenVentaController extends Controller
 		$producto			=	Producto::where('indproduccion','=',1)->skip(1)->first();
 
 		$swmodificar        =   true;
-		$listagemas 		=	DetalleEsquemaProducto::where('esquemaproducto_id','=',$registro->id)->where('activo','=',1)->get();
+		$listagemas 		=	DetalleEsquemaProducto::where('ordenventa_id','=',$ordenventa->id)->where('activo','=',1)->get();
+
 		// dd($listagemas);
 		return View::make('ordenventa/modificaresquema',
 					[
 						'idopcion'                  =>  $idopcion,
 						'idregistro'				=>	$idregistro,
-						'registro'           		=>  $registro,
+						'tab'						=>	$tab,
+
+						'lregistro'           		=>  $lregistro,
 						'ordenventa'           		=>  $ordenventa,
-						'listagemas'       		=>  $listagemas,
+						'listadetalle'           	=>  $listadetalle,
+						'listagemas'       			=>  $listagemas,
 						'combo_gemas'               =>  $combo_gemas,
 						'select_gemas'              =>  $select_gemas,
 						'combo_origen_gema'         =>  $combo_origen_gema,
@@ -427,7 +641,99 @@ class GestionOrdenVentaController extends Controller
 	}
 
 
-	public function actionOrdenVentaModificarEsquemaProductos($idopcion,$idregistro,Request $request)
+	public function actionOrdenVentaMargenProductos($idopcion,$idregistro,Request $request)
+	{
+
+			/******************* validar url **********************/
+		$validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+		if($validarurl <> 'true'){return $validarurl;}
+		/******************************************************/
+		$registro_id = $this->funciones->decodificarmaestra($idregistro);
+		View::share('titulo','Margen Orden Venta');
+
+
+		/******************************/
+		$usuario			=	User::where('id',Session::get('usuario')->id)->first();
+		$ordenventa			=	OrdenVenta::find($registro_id);
+		$listadetalle		=	DetalleOrdenVenta::where('activo','=',1)
+								->where('ordenventa_id','=',$registro_id)
+								->orderby('id','asc')
+								->orderby('producto_descripcion','asc')
+								->get();
+		$lregistro 			=	EsquemaProducto::where('ordenventa_id','=',$registro_id)->where('activo','=',1)->get();
+		$activo_esquema 	=	EsquemaProducto::where('ordenventa_id','=',$registro_id)->where('activo','=',1)->first();
+        
+		$tab 				=	$activo_esquema->id;
+        if(Session::has('tab')){
+            $tab           =   Session::get('tab');
+        }
+		$combo_gemas		=   array('' => "Seleccione Gema") + Producto::where('subcategoria_nombre','=','GEMAS')->pluck('descripcion','id')->toArray();// + $datos;
+		$select_gemas		=   '';
+		$tipocambio			=   TipoCambio::where('fecha','<=',date('d-m-Y'))->orderby('fecha','desc')->first();
+		$combo_origen_gema	=   array('' => "Seleccione Origen") + Categoria::where('tipo_categoria','=','TIPO_ORIGEN_GEMA')->pluck('descripcion','id')->toArray();// + $datos;
+		$select_origen_gema	=   '';
+		$producto			=	Producto::where('indproduccion','=',1)->skip(1)->first();
+		$swmodificar        =   true;
+		$listagemas 		=	DetalleEsquemaProducto::where('ordenventa_id','=',$ordenventa->id)->where('activo','=',1)->get();
+
+		return View::make('ordenventa/margenordenventa',
+					[
+						'idopcion'                  =>  $idopcion,
+						'idregistro'				=>	$idregistro,
+						'tab'						=>	$tab,
+						'lregistro'           		=>  $lregistro,
+						'ordenventa'           		=>  $ordenventa,
+						'listadetalle'           	=>  $listadetalle,
+						'listagemas'       			=>  $listagemas,
+						'combo_gemas'               =>  $combo_gemas,
+						'select_gemas'              =>  $select_gemas,
+						'combo_origen_gema'         =>  $combo_origen_gema,
+						'select_origen_gema'        =>  $select_origen_gema,
+						'tipocambio'				=>	$tipocambio,
+						'swmodificar'               => $swmodificar,
+					]);
+	}
+
+
+	public function actionOrdenVentaModificarMargenProductos($idopcion,$idordenventa,Request $request)
+	{
+		View::share('titulo','Agregar Margen Orden de Venta');
+		if($_POST)
+		{
+			
+			try {
+					DB::beginTransaction();
+					/******************************/
+					$registro_id = $this->funciones->decodificarmaestra($idordenventa);
+
+					$descuento_shopify				=	(float)$request['descuento_shopify'];
+					$checkout						=	(float)$request['checkout'];
+					$shipping						=	(float)$request['shipping'];
+					$papeleria						=	(float)$request['papeleria'];
+					$cabecera                   	=   OrdenVenta::find($registro_id);
+					$cabecera->descuento_shopify	=	$descuento_shopify;
+					$cabecera->checkout				=	$checkout;
+					$cabecera->shipping				=	$shipping;
+					$cabecera->papeleria			=	$papeleria;
+					$cabecera->fecha_mod      		=   $this->fechaactual;
+					$cabecera->usuario_mod     		=   Session::get('usuario')->id;
+					$cabecera->save();
+					$this->ov_calculo_total_orden_venta($registro_id);
+					DB::commit();
+			} catch (Exception $ex) {
+				DB::rollback();
+				$msj =$this->ge_getMensajeError($ex);
+				return Redirect::to('orden-ventas-margen-producto/'.$idopcion.'/'.$idordenventa)->with('errorurl', $msj);
+			}
+			/******************************/
+
+			return Redirect::to('/orden-ventas-margen-producto/'.$idopcion.'/'.$idordenventa)->with('bienhecho', 'Registro guardado realizado con exito');
+		}
+
+	}
+
+
+	public function actionOrdenVentaModificarEsquemaProductos($idopcion,$idesquemaproducto,$idordenventa,Request $request)
 	{
 		View::share('titulo','Agregar Esquema Producto');
 		if($_POST)
@@ -436,125 +742,128 @@ class GestionOrdenVentaController extends Controller
 			try {
 					DB::beginTransaction();
 					/******************************/
-					// $registro_id				=	$this->funciones->decodificarmaestra($idregistro);
-					$registro_id				=	$request['registro_id'];
-					$listagemas 				=	explode('&&&',$request['xmllistagemas']);
-					// dd($listagemas);
-					$usuario                    =   User::where('id',Session::get('usuario')->id)->first();
-					// $descripcion                =   $request['descripcion'];
 
-					$producto_id                =   $request['producto_id'];
-					$producto                   =   Producto::where('id','=',$producto_id)->first();
-					
-					$tipooro_id					=	$request['tipooro_id'];
-					$tipooro                    =   Producto::where('id','=',$tipooro_id)->first();
-
-					$gramos						=	(float)$request['gramos'];
-					$precio_x_gramo				=	(float)$request['precio_x_gramo'];
-
-					$cantidad_engaste			=	(int)$request['cantidad_engaste'];
-					$precio_unitario_engaste	=	(float)$request['precio_unitario_engaste'];
-					$precio_total_engaste		=	(float)$request['precio_total_engaste'];
-					$precio_total_engaste		=	(float)$request['precio_total_engaste'];
-					// dd($this->monedaxdefecto);
-					$moneda                     =   Moneda::where('id','=',$this->monedaxdefecto)->first();
-					$fecha                      =   date('Y-m-d');
-
-					
-
-					$tipocambio                 	=   TipoCambio::where('fecha','<=',date('d-m-Y'))->orderby('fecha','desc')->first();
-					$cabecera                   	=   EsquemaProducto::find($registro_id);
-			
-					$cabecera->producto_id    		=   $producto_id;
-					$cabecera->producto_descripcion =   $producto->descripcion;
-
-					$cabecera->tipooro_id       	=   $tipooro_id;
-					$cabecera->tipooro_descripcion  =   $tipooro->descripcion;
-					
-					$cabecera->gramos				=	$gramos;
-					$cabecera->precio_x_gramo		=	$precio_x_gramo;
-					$cabecera->costo_total_oro		=	(float)($gramos*$precio_x_gramo);
-					
-					
-					$cabecera->cantidad_total_gemas		=	$cantidad_engaste;
-					$cabecera->cantidad_engaste			=	$cantidad_engaste;
-					$cabecera->precio_unitario_engaste	=	$precio_unitario_engaste;
-					$cabecera->precio_total_engaste		=	$precio_total_engaste;
-
-					$cabecera->ind_igv					=	$request['indigv'];
-					$cabecera->monto_igv				=	(float)$request['monto_igv'];
-					$cabecera->costo_unitario			=	(float)$request['costo_unitario'];
-					$cabecera->costo_unitario_igv			=	(float)$request['costo_unitario_igv'];
-					$cabecera->costo_unitario_igv			=	(float)$request['costo_unitario_igv'];
-					$cabecera->costo_unitario_total			=	(float)$request['costo_unitario_total'];
-
-					$cabecera->tc               		=   $tipocambio->venta;
-					$cabecera->costo_unitario_total_mn	=	((float)$request['costo_unitario_total'])*$tipocambio->venta;
-
-					// $cabecera->estado_id                =   '1CIX00000003';
-					// $cabecera->estado_descripcion       =   'GENERADO'; 
-					$cabecera->costo_total_gemas		=	(float)($request['htotal_costo_gemas']);
-					
-					$cabecera->fecha            =   date('d-m-Y');
-					$cabecera->fecha_mod       =   $this->fechaactual;
-					$cabecera->usuario_mod     =   Session::get('usuario')->id;
+					$gramos							=	(float)$request['gramos'];
+					$precio_x_gramo					=	(float)$request['precio_x_gramo'];
+					$engaste						=	(int)$request['engaste'];
+					$costo_total_oro 				=	(float)($gramos*$precio_x_gramo);
+					$costo_unitario 				=	$engaste + $costo_total_oro;
+					$cabecera                   		=   EsquemaProducto::find($idesquemaproducto);
+					$cabecera->gramos					=	$gramos;
+					$cabecera->precio_x_gramo			=	$precio_x_gramo;
+					$cabecera->costo_total_oro			=	$costo_total_oro;
+					$cabecera->precio_total_engaste		=	$engaste;
+					$cabecera->costo_unitario			=	$costo_unitario + $cabecera->costo_total_gemas;
+					$cabecera->costo_unitario_igv		=	$costo_unitario + $cabecera->costo_total_gemas;
+					$cabecera->fecha            		=   date('d-m-Y');
+					$cabecera->fecha_mod       			=   $this->fechaactual;
+					$cabecera->usuario_mod     			=   Session::get('usuario')->id;
 					$cabecera->save();
-					// dd(count($listagemas));
-					$cantidad = count($listagemas) -1;
-					// dd($listagemas);
-					DetalleEsquemaProducto::where('esquemaproducto_id','=',$registro_id)
-										->update(
-											[
-												'fecha_mod'=>date('d-m-Y'),
-												'usuario_mod'=>Session::get('usuario')->id,
-												'activo'=>0,
-											]
-										);
-					foreach ($listagemas as $index => $gema) {
-						$datos = explode('***', $gema);
-						if($index<$cantidad){
-
-							$categoria_origen = Categoria::where('tipo_categoria','=','TIPO_ORIGEN_GEMA')->where('descripcion','=',$datos[0])->first();
-							// dd($categoria_origen);
-							$idregistro              	=   $this->funciones->getCreateIdMaestra('detalleesquemaproducto');
-							// $codigo                     =   $this->funciones->getCreateCodCorrelativo('ordenventas',8);
-
-							$detalle					=	New DetalleEsquemaProducto();
-							$detalle->id            	=   $idregistro;
-							$detalle->esquemaproducto_id	=	$registro_id;
-							$detalle->origen_id			=	$categoria_origen->id;
-							$detalle->origendescripcion	=	$categoria_origen->descripcion;
-
-							$detalle->tipo_id			=	$datos[1];
-							$detalle->tipodescripcion	=	$datos[2];
-							$detalle->cantidad			=	$datos[3];
-							$detalle->costo_unitario	=	(float)$datos[4];
-							$detalle->costo_total		=	((float)($datos[4]))*((float)($datos[3]));
-
-							$detalle->usuario_crea     =   Session::get('usuario')->id;
-							$detalle->fecha            	=   date('d-m-Y');
-							$detalle->fecha_mod       	=   $this->fechaactual;
-							$detalle->usuario_mod     	=   Session::get('usuario')->id;
-							$detalle->save();
-						}
-
-					}
-
-
-
-					$idregistroen               =   Hashids::encode(substr($idregistro, -8));
 
 					DB::commit();
 				
 			} catch (Exception $ex) {
 				DB::rollback();
 				$msj =$this->ge_getMensajeError($ex);
-				return Redirect::to('/orden-ventas-esquema-producto/'.$idopcion.'/'.$idregistro)->with('errorurl', $msj);
+				return Redirect::to('orden-ventas-esquema-producto/'.$idopcion.'/'.$idordenventa)->with('errorurl', $msj);
 			}
 			/******************************/
 
-			return Redirect::to('/gestion-orden-venta/'.$idopcion)->with('bienhecho', 'Registro realizado con exito');
+
+
+            Session::flash('tab', $idesquemaproducto);
+			return Redirect::to('/orden-ventas-esquema-producto/'.$idopcion.'/'.$idordenventa)->with('bienhecho', 'Registro guardado realizado con exito');
 		}
 
 	}
+
+	public function actionAjaxActualizarEnvioOrdenVenta(Request $request)
+    {
+        $orden_venta_id             =   $request['data_orden_venta_id'];
+        $idopcion                   =   $request['idopcion'];
+        $envio                   	=   $request['envio'];
+        
+        $cabecera                    =   OrdenVenta::where('id','=',$orden_venta_id)->first();
+        $cabecera->envio =   $envio;
+        $cabecera->fecha_mod         =   $this->fechaactual;
+        $cabecera->usuario_mod       =   Session::get('usuario')->id;
+        $cabecera->save();
+
+        $funcion                            =   $this;
+
+        $registro                 =   OrdenVenta::where('id', $orden_venta_id)->first();
+        $listadetalle             =   DetalleOrdenVenta::where('activo','=',1)
+                                                ->where('ordenventa_id','=',$orden_venta_id)
+                                                ->orderby('producto_descripcion','asc')->get();
+
+        $funcion                    =   $this;
+        return View::make('ordenventa/ajax/adetalleov',
+                         [
+                            'registro'         			=> $registro,
+                            'listadetalle'              => $listadetalle,
+                            'idopcion'                  => $idopcion,
+                            'ajax'                      => true,                            
+                         ]);
+
+    }
+
+    public function actionAjaxActualizarDescuentoOrdenVenta(Request $request)
+    {
+        $orden_venta_id             =   $request['data_orden_venta_id'];
+        $idopcion                   =   $request['idopcion'];
+        $descuento                   	=   $request['descuento'];
+        
+        $cabecera                    =   OrdenVenta::where('id','=',$orden_venta_id)->first();
+        $cabecera->descuento =   $descuento;
+        $cabecera->fecha_mod         =   $this->fechaactual;
+        $cabecera->usuario_mod       =   Session::get('usuario')->id;
+        $cabecera->save();
+
+        $funcion                            =   $this;
+
+        $registro                 =   OrdenVenta::where('id', $orden_venta_id)->first();
+        $listadetalle             =   DetalleOrdenVenta::where('activo','=',1)
+                                                ->where('ordenventa_id','=',$orden_venta_id)
+                                                ->orderby('producto_descripcion','asc')->get();
+
+        $funcion                    =   $this;
+        return View::make('ordenventa/ajax/adetalleov',
+                         [
+                            'registro'         			=> $registro,
+                            'listadetalle'              => $listadetalle,
+                            'idopcion'                  => $idopcion,
+                            'ajax'                      => true,                            
+                         ]);
+
+    }
+
+    public function actionAjaxActualizarSeguroOrdenVenta(Request $request)
+    {
+        $orden_venta_id             =   $request['data_orden_venta_id'];
+        $idopcion                   =   $request['idopcion'];
+        $seguro                   	=   $request['seguro'];
+        
+        $cabecera                    =   OrdenVenta::where('id','=',$orden_venta_id)->first();
+        $cabecera->seguro =   $seguro;
+        $cabecera->fecha_mod         =   $this->fechaactual;
+        $cabecera->usuario_mod       =   Session::get('usuario')->id;
+        $cabecera->save();
+
+        $funcion                            =   $this;
+
+        $registro                 =   OrdenVenta::where('id', $orden_venta_id)->first();
+        $listadetalle             =   DetalleOrdenVenta::where('activo','=',1)
+                                                ->where('ordenventa_id','=',$orden_venta_id)
+                                                ->orderby('producto_descripcion','asc')->get();
+
+        $funcion                    =   $this;
+        return View::make('ordenventa/ajax/adetalleov',
+                         [
+                            'registro'         			=> $registro,
+                            'listadetalle'              => $listadetalle,
+                            'idopcion'                  => $idopcion,
+                            'ajax'                      => true,                            
+                         ]);
+
+    }
 }

@@ -80,6 +80,32 @@ $(document).ready(function(){
 		CalcularTotalCosto()
 	});
 
+    $(".venta").on('dblclick','.dobleclickpc', function(e) {
+
+        var _token                  =   $('#token').val();
+        var gema_esquema_id         =   $(this).attr('gema_esquema_id');
+        var esquema_id              =   $(this).attr('esquema_id');
+        var ordenventa_id           =   $('#ordenventa_id').val();
+
+        var idopcion                =   $('#idopcion').val();
+
+        debugger;
+
+        data                        =   {
+                                            _token                  : _token,
+                                            gema_esquema_id         : gema_esquema_id,
+                                            esquema_id              : esquema_id,
+                                            ordenventa_id           : ordenventa_id,
+                                            idopcion                : idopcion,
+                                        };
+
+        ajax_modal(data,"/ajax-modal-detalle-gema-esquema",
+                  "modal-detalle-registro","modal-detalle-registro-container");
+
+    });
+ 
+
+
 	$('#sectionregistro').on('keyup','#gramos',function(event){
 		CalcularTotalCosto();
 	});

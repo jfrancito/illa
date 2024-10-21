@@ -5,8 +5,9 @@
 							[
 								'class'       => 'select2 select3 form-control control input-xs' ,
 								'id'          => 'subcategoria_id',
-								'required'    => '',                        
-								'data-aw'     => '2'
+								'required'    => '',
+								'disabled'    => $disabled,                        
+								'data-aw'     => '2'								
 							]) !!}
 		@include('error.erroresvalidate', [ 'id' => $errors->has('subcategoria_id')  , 
 											'error' => $errors->first('subcategoria_id', ':message') , 

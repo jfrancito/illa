@@ -10,6 +10,7 @@ use App\Modelos\Cliente;
 use App\Modelos\Categoria;
 use App\Modelos\Proveedor;
 use App\Modelos\Producto;
+use App\Modelos\ProductoGema;
 
 use App\User;
 use Illuminate\Http\Request;
@@ -18,6 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redirect;
 use Session;
 use View;
+use Hashids;
 use App\Traits\GeneralesTraits;
 use App\Traits\ConfiguracionTraits;
 
@@ -593,10 +595,14 @@ class ConfiguarionController extends Controller {
 			$unidad_medida_id	 		= 	$request['unidad_medida_id'];
 			$categoria_id	 			= 	$request['categoria_id'];
 			$subcategoria_id	 		= 	$request['subcategoria_id'];
+			$precio_venta 				=   $request['precio_venta'];
+			$tipo_oro_id	 			= 	$request['tipo_oro_id'];
+			$cantidad_oro 				=   $request['cantidad_oro'];
 					
 			$unidad_medida	 			= 	Categoria::where('id','=',$unidad_medida_id)->first();
 			$categoria_prod	 			= 	Categoria::where('id','=',$categoria_id)->first();
 			$subcategoria_prod	 		= 	Categoria::where('id','=',$subcategoria_id)->first();
+			$tipo_oro			 		= 	Producto::where('id','=',$tipo_oro_id)->first();
 
 			$idproducto 				=   $this->funciones->getCreateIdMaestra('productos');
 			
@@ -621,6 +627,10 @@ class ConfiguarionController extends Controller {
 				$unidad_medida	 					= 	Categoria::where('tipo_categoria','=','UNIDAD_MEDIDA')->where('aux01','=','UND')->first();
 				$cabecera->unidad_medida_id			=   $unidad_medida->id;
 				$cabecera->unidad_medida_nombre 	=   $unidad_medida->descripcion;	
+				$cabecera->precio_venta				=   (float)$precio_venta;
+				$cabecera->tipo_oro_id				=   $tipo_oro->id;
+				$cabecera->tipo_oro_nombre 			=   $tipo_oro->descripcion;	
+				$cabecera->cantidad_oro				=   (float)$cantidad_oro;
 			}
 			else
 			{
@@ -636,8 +646,9 @@ class ConfiguarionController extends Controller {
 			$cabecera->fecha_crea 	 			=   $this->fechaactual;
 			$cabecera->usuario_crea 			=   Session::get('usuario')->id;
 			$cabecera->save();
- 
- 		 	return Redirect::to('/gestion-de-productos/'.$idopcion)->with('bienhecho', 'Producto '.$descripcion.' registrado con exito');
+ 			
+ 			$idproductoen							= 	Hashids::encode(substr($idproducto, -8));
+ 		 	return Redirect::to('/modificar-productos/'.$idopcion.'/'.$idproductoen)->with('bienhecho', 'Producto '.$descripcion.' registrado con exito');
 
 		}else{
 
@@ -649,6 +660,11 @@ class ConfiguarionController extends Controller {
 
 			$select_subcategoria  	=	'';
 			$combo_subcategoria		=	[];
+			$select_tipo_oro			=	'';
+			$combo_tipo_oro	 			=	[''=>'SELECCIONE TIPO ORO']+Producto::where('subcategoria_nombre','=','ORO')->where('activo','=',1)->pluck('descripcion','id')->toArray();
+			$combo_gemas		=   array('' => "Seleccione Gema") + Producto::where('subcategoria_nombre','=','GEMAS')->pluck('descripcion','id')->toArray();// + $datos;
+			$select_gemas		=   '';
+			$disabled 			= false;
 		    // $combo_subcategoria 	=	$this->gn_combo_subcategoria('CAT_PRODUCTO','Seleccione Categoria','');
 		    // $combo_subcategoria 	=	$this->gn_combo_subcategoria('CAT_PRODUCTO','Seleccione Categoria','');
 
@@ -661,6 +677,11 @@ class ConfiguarionController extends Controller {
 							'combo_categoria'   		=> $combo_categoria,	
 							'select_subcategoria'  		=> $select_subcategoria,
 							'combo_subcategoria'   		=> $combo_subcategoria,	
+							'select_tipo_oro'  			=> $select_tipo_oro,
+							'combo_tipo_oro'   			=> $combo_tipo_oro,	
+							'combo_gemas'  				=> $combo_gemas,
+							'select_gemas'   			=> $select_gemas,	
+							'disabled'   				=> $disabled,	
 						  	'idopcion'  			 	=> $idopcion
 						]);
 		}
@@ -679,7 +700,6 @@ class ConfiguarionController extends Controller {
 		if($_POST)
 		{
 
-
 			$codigo 	 						= 	$request['codigo'];
 			$descripcion 	 					= 	$request['descripcion'];
 			$peso 	 							= 	$request['peso'];
@@ -687,43 +707,42 @@ class ConfiguarionController extends Controller {
 			$categoria_id	 					= 	$request['categoria_id'];
 			$subcategoria_id	 				= 	$request['subcategoria_id'];
 			$activo 	 		 				= 	$request['activo'];
+			$precio_venta 						=   $request['precio_venta'];
+			$tipo_oro_id	 					= 	$request['tipo_oro_id'];
+			$cantidad_oro 						=   $request['cantidad_oro'];
+			$ocategoria_id 						=   $request['ocategoria_id'];
 
 			$categoria_prod	 					= 	Categoria::where('id','=',$categoria_id)->first();
 			$subcategoria_prod	 				= 	Categoria::where('id','=',$subcategoria_id)->first();
+			$tipo_oro			 				= 	Producto::where('id','=',$tipo_oro_id)->first();
 
 			$cabecera            	 			=	Producto::find($idproducto);
-			$cabecera->codigo 					=   $codigo;			
-			$cabecera->descripcion 	   			=   $descripcion;
-			$cabecera->peso			 	 	  	=   (float)$peso;
-			$cabecera->categoria_id				=   $categoria_prod->id;
-			$cabecera->categoria_nombre			=   $categoria_prod->descripcion;
-			
-			$cabecera->subcategoria_id			=   $subcategoria_prod->id;
-			$cabecera->subcategoria_nombre		=   $subcategoria_prod->descripcion;
-			if($categoria_id=='CATP00000003'){
-				$cabecera->indservicio			=	1;
-				$cabecera->unidad_medida_id			=   NULL;
-				$cabecera->unidad_medida_nombre 	=   NULL;
-			}
-			else
-			{
-				$unidad_medida	 					= 	Categoria::where('id','=',$unidad_medida_id)->first();
-				$cabecera->unidad_medida_id			=   $unidad_medida->id;
-				$cabecera->unidad_medida_nombre 	=   $unidad_medida->descripcion;	
-			}
+					
+			if($ocategoria_id=='CATP00000007'){		
+				$cabecera->precio_venta				=   (float)$precio_venta;
+				$cabecera->tipo_oro_id				=   $tipo_oro->id;
+				$cabecera->tipo_oro_nombre 			=   $tipo_oro->descripcion;	
+				$cabecera->cantidad_oro				=   (float)$cantidad_oro;
+			}			
 
 			$cabecera->activo 	 	 			=   $activo;
 			$cabecera->fecha_mod 	 			=   $this->fechaactual;
 			$cabecera->usuario_mod 				=   Session::get('usuario')->id;
 			$cabecera->save();
 
-
- 			return Redirect::to('/gestion-de-productos/'.$idopcion)->with('bienhecho', 'Producto '.$descripcion.' modificado con éxito');
+ 			
+ 			$idproductoen							= 	Hashids::encode(substr($idproducto, -8));
+ 		 	return Redirect::to('/modificar-productos/'.$idopcion.'/'.$idproductoen)->with('bienhecho', 'Producto '.$descripcion.' registrado con exito');
 
 		}else{
 
 		    $combo_unidad_medida 		=	$this->gn_combo_categoria('UNIDAD_MEDIDA','Seleccione unidad medida','');
 			$producto 					= 	Producto::where('id', $idproducto)->first();
+
+			$listaproductogema			= 	ProductoGema::where('activo','=',1)
+												->where('producto_id','=',$idproducto)
+												->orderby('gema_nombre','asc')->get();
+			
 			$select_unidad_medida 		= 	$producto->unidad_medida_id;
 		    
   			$select_categoria  			=	$producto->categoria_id;
@@ -738,15 +757,27 @@ class ConfiguarionController extends Controller {
 												->whereNotIn('id',[$producto->subcategoria_id])
 												->pluck('descripcion','id')->toArray();
 
+			$select_tipo_oro			=	$producto->tipo_oro_id;
+			$combo_tipo_oro	 			=	[''=>'SELECCIONE TIPO ORO']+Producto::where('subcategoria_nombre','=','ORO')->where('activo','=',1)->pluck('descripcion','id')->toArray();
+			$combo_gemas		=   array('' => "Seleccione Gema") + Producto::where('subcategoria_nombre','=','GEMAS')->pluck('descripcion','id')->toArray();// + $datos;
+			$select_gemas		=   '';
+			$disabled 			= true;
+
 	        return View::make('configuracion/modificarproducto', 
 	        				[
 	        					'combo_unidad_medida'  		=> $combo_unidad_medida,
 	        					'producto'  				=> $producto,
+	        					'listaproductogema'  		=> $listaproductogema,
 		        				'select_unidad_medida' 		=> $select_unidad_medida,
 		        				'select_categoria'			=> $select_categoria,
 		        				'combo_categoria'			=> $combo_categoria,
-		        				'select_subcategoria'			=> $select_subcategoria,
-		        				'combo_subcategoria'			=> $combo_subcategoria,
+		        				'select_subcategoria'		=> $select_subcategoria,
+		        				'combo_subcategoria'		=> $combo_subcategoria,
+		        				'select_tipo_oro'			=> $select_tipo_oro,
+		        				'combo_tipo_oro'			=> $combo_tipo_oro,
+		        				'combo_gemas'				=> $combo_gemas,
+		        				'select_gemas'				=> $select_gemas,
+		        				'disabled'   				=> $disabled,	
 					  			'idopcion' 					=> $idopcion
 	        				]);
 		}
@@ -757,11 +788,12 @@ class ConfiguarionController extends Controller {
 		$categoria_id			=	$request['categoria_id'];
 		$select_subcategoria  	=	'';
 		$combo_subcategoria		=	Categoria::where('tipo_categoria','=','SUBCAT_PRODUCTO')->where('activo','=',1)->where('aux01','=',$categoria_id)->pluck('descripcion','id')->toArray();
-		
+		$disabled 				=	false;
 		return View::make('configuracion/ajax/asubcategoriaproducto',
 						[
 							'select_subcategoria'  		=> $select_subcategoria,
 							'combo_subcategoria'   		=> $combo_subcategoria,	
+							'disabled'   				=> $disabled,	
 						  	'ajax'						=>	true,
 						]);
 	}
@@ -860,6 +892,84 @@ class ConfiguarionController extends Controller {
 					  			'idopcion' 						=> $idopcion
 	        				]);
 		}
+	}
+
+	public function actionAjaxModalProductoGema(Request $request)
+	{
+		$producto_id 	 = 	$request['producto_id'];
+		$idopcion 		 = 	$request['idopcion'];
+
+		$producto 							= 	Producto::where('id', $producto_id)->first();		
+		$producto_nombre					=	$producto->descripcion;
+		//$opcionproducto 					=	Opcion::where('nombre','=','Productos')->where('activo','=',1)->first();
+		//$idopcionproducto 					=	($opcionproducto) ? Hashids::encode(substr($opcionproducto->id,-8)) : '';
+		$combo_gemas		=   array('' => "Seleccione Gema") + Producto::where('subcategoria_nombre','=','GEMAS')->pluck('descripcion','id')->toArray();// + $datos;
+		$select_gemas		=   '';
+		
+		//dd($combo_producto);
+		
+		return View::make('configuracion/modal/ajax/maproductogema',
+						 [		 	
+						 	'producto_id' 				=> $producto_id,						 	
+						 	'producto_nombre' 			=> $producto_nombre,						 	
+						 	'select_gemas' 				=> $select_gemas,
+						 	'combo_gemas' 				=> $combo_gemas,
+						 	'idopcion' 					=> $idopcion,						 	
+						 	'ajax' 						=> true,						 	
+						 ]);
+	}
+
+	public function actionAgregarProductoGema($idopcion,$idproducto,Request $request)
+	{
+		/******************* validar url **********************/
+		$validarurl = $this->funciones->getUrl($idopcion,'Anadir');
+	    if($validarurl <> 'true'){return $validarurl;}
+	    /******************************************************/
+
+	    $idproducto = $this->funciones->decodificarmaestra($idproducto);		
+
+	    $gema_id	 							= 	$request['tipogema_id'];
+	    $cantidad	 							= 	$request['cantidad'];
+
+		$producto	 							= 	Producto::where('id','=',$idproducto)->first();
+		$gema	 								= 	Producto::where('id','=',$gema_id)->first();				
+
+		$idproductogema 						=   $this->funciones->getCreateIdMaestra('productogemas');
+		
+		$productogema            	 			=	new ProductoGema;
+		$productogema->id 	     	 			=   $idproductogema;
+		$productogema->producto_id 	     	 	=   $producto->id;
+		$productogema->producto_nombre 			=   $producto->descripcion;			
+		$productogema->gema_id 	   				=   $gema->id;
+		$productogema->gema_nombre			 	=   $gema->descripcion;		
+		$productogema->cantidad			 		=   $cantidad;
+		$productogema->fecha_crea 	 			=   $this->fechaactual;
+		$productogema->usuario_crea 			=   Session::get('usuario')->id;
+		$productogema->save();				
+
+		$idproductoen							= 	Hashids::encode(substr($idproducto, -8));
+ 		 	return Redirect::to('/modificar-productos/'.$idopcion.'/'.$idproductoen)->with('bienhecho', 'Gema'.$gema->descripcion.' registrada con exito');		
+	}
+
+	public function actionQuitarProductoGema($idopcion,$idproductogema,Request $request)
+	{
+		/******************* validar url **********************/
+		$validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+	    if($validarurl <> 'true'){return $validarurl;}
+	    /******************************************************/
+	    $idproductogema = $this->funciones->decodificarmaestra($idproductogema);		
+					
+		$activo			 						= 	0;
+
+		$productogema            	 			=	ProductoGema::find($idproductogema);
+		$productogema->activo 					=   $activo;					
+		$productogema->fecha_mod 	 			=   $this->fechaactual;
+		$productogema->usuario_mod 				=   Session::get('usuario')->id;
+		$productogema->save();
+
+		$idproductoen								= 	Hashids::encode(substr($productogema->producto_id, -8));
+		 	return Redirect::to('/modificar-productos/'.$idopcion.'/'.$idproductoen)->with('bienhecho', 'Gema'.$productogema->gema_nombre.' quitada con exito');
+		
 	}
 
 }

@@ -30,6 +30,13 @@ use Keygen;
 trait GeneralesTraits
 {
 
+	public function ge_tipo_cambio()
+	{
+		$tipo_cambio = 3.9;
+		return $tipo_cambio;
+	}
+
+
 	public function ge_getIdCategoria($descripcion,$tipo)
 	{
 		$consulta = Categoria::where('descripcion','=',$descripcion)->where('tipo_categoria','=',$tipo)->where('activo','=',1)->first();

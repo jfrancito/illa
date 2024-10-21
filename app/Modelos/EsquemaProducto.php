@@ -25,6 +25,11 @@ class EsquemaProducto extends Model
         return $this->hasMany('App\Modelos\DetalleCompra','compra_id','id')->whereActivo(1);
     }
 
+    public function DetalleEsquema(){
+        return $this->hasMany('App\Modelos\DetalleEsquemaProducto','esquemaproducto_id','id')->whereActivo(1);
+    }
+
+
     public function Proveedor(){
         return $this->belongsTo('App\Modelos\Proveedor','proveedor_id','id');
     }   

@@ -5,8 +5,7 @@
       <th>Codigo</th>
       <th>Categoria</th>
       <th>Sub Categoria</th>
-      <th>Descripcion</th>
-      <th>Peso</th>
+      <th>Descripcion</th>      
       <th>Unidad Medida</th>      
       <th>Estado</th>
       <th>Opciones</th>
@@ -19,8 +18,7 @@
         <td>{{$item->codigo}}</td>
         <td>{{$item->categoria_nombre}}</td>
         <td>{{$item->subcategoria_nombre}}</td>
-        <td>{{$item->descripcion}}</td>
-        <td>{{$item->peso}}</td>
+        <td>{{$item->descripcion}}</td>        
         <td>@if(isset($item->unidad_medida_nombre))
               {{$item->unidad_medida_nombre}}
             @else

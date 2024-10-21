@@ -65,6 +65,8 @@
         'prefix': '', 
         'placeholder': '0'});
         $('.formagregarproducto .datosproducto').hide();
+        $('.formagregarproducto .datosbienesproducidos').hide();
+        $('.formagregarproducto .datosproductogemas').hide();
       });
     </script> 
 

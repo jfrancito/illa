@@ -308,6 +308,161 @@ $(document).ready(function(){
 		});
 	});
 
+	$(".contenedor_ov_detalle").on('click','.btnupdenvio', function(e) {
+
+        debugger;
+        var envio         					=   $(".contenedor_ov_detalle .envio").val();
+        var envioorg      					=   $(this).attr('data_monto_envio');
+        var accion          				=   'Desea Actualizar el Monto de Envio de : ' + envioorg + ' a '+envio+ ' ?';
+        var _token                      	=   $('#token').val();
+        var idopcion                    	=   $('#idopcion').val();        
+        var data_orden_venta_id          	=   $(this).attr('data_orden_venta_id');        
+     
+        data    =   {
+                        _token                      : _token,
+                        data_orden_venta_id         : data_orden_venta_id,                        
+                        idopcion                    : idopcion,
+                        envio                       : envio,
+                    };
+
+        $.confirm({
+            title: '¿Confirma Actualizacion del Monto de Envio?',
+            content: accion,
+            buttons: {
+                confirmar: function () {
+                    ModificarEnvioOV(data,data_orden_venta_id,_token,idopcion);
+                },
+                cancelar: function () {
+                    debugger;
+                    $.alert('Se cancelo la Actualizacion del Monto de Envio');
+                    $('.contenedor_ov_detalle .envio').val(envioorg);
+                }
+            }
+        });
+
+    });
+
+    function ModificarEnvioOV(data,data_orden_venta_id,_token,idopcion)
+	{
+	    abrircargando();
+	    $.ajax({
+	        type    :   "POST",
+	        url     :   carpeta+'/ajax-actualizar-envio-orden-venta',
+	        data    :   data,
+	        success: function (data) {
+	            cerrarcargando();
+	            $('.contenedor_ov_detalle').html(data);	            
+	        },
+	        error: function (data) {
+	            cerrarcargando();
+	            error500(data);
+	        }
+	    });   
+	}
+
+	$(".contenedor_ov_detalle").on('click','.btnupddescuento', function(e) {
+
+        debugger;
+        var descuento         				=   $(".contenedor_ov_detalle .descuento").val();
+        var descuentoorg      				=   $(this).attr('data_monto_descuento');
+        var accion          				=   'Desea Actualizar el Monto de Descuento de : ' +descuentoorg + ' a '+descuento+ ' ?';
+        var _token                      	=   $('#token').val();
+        var idopcion                    	=   $('#idopcion').val();        
+        var data_orden_venta_id          	=   $(this).attr('data_orden_venta_id');        
+     
+        data    =   {
+                        _token                      : _token,
+                        data_orden_venta_id         : data_orden_venta_id,                        
+                        idopcion                    : idopcion,
+                        descuento                   : descuento,
+                    };
+
+        $.confirm({
+            title: '¿Confirma Actualizacion del Monto de Descuento?',
+            content: accion,
+            buttons: {
+                confirmar: function () {
+                    ModificarDescuentoOV(data,data_orden_venta_id,_token,idopcion);
+                },
+                cancelar: function () {
+                    debugger;
+                    $.alert('Se cancelo la Actualizacion del Monto de Descuento');
+                    $('.contenedor_ov_detalle .descuento').val(descuentoorg);
+                }
+            }
+        });
+
+    });
+
+    function ModificarDescuentoOV(data,data_orden_venta_id,_token,idopcion)
+	{
+	    abrircargando();
+	    $.ajax({
+	        type    :   "POST",
+	        url     :   carpeta+'/ajax-actualizar-descuento-orden-venta',
+	        data    :   data,
+	        success: function (data) {
+	            cerrarcargando();
+	            $('.contenedor_ov_detalle').html(data);	            
+	        },
+	        error: function (data) {
+	            cerrarcargando();
+	            error500(data);
+	        }
+	    });   
+	}
+
+	$(".contenedor_ov_detalle").on('click','.btnupdseguro', function(e) {
+
+        debugger;
+        var seguro         					=   $(".contenedor_ov_detalle .seguro").val();
+        var seguroorg      					=   $(this).attr('data_monto_seguro');
+        var accion          				=   'Desea Actualizar el Monto de Seguro de : ' + seguroorg + ' a '+seguro+ ' ?';
+        var _token                      	=   $('#token').val();
+        var idopcion                    	=   $('#idopcion').val();        
+        var data_orden_venta_id          	=   $(this).attr('data_orden_venta_id');        
+     
+        data    =   {
+                        _token                      : _token,
+                        data_orden_venta_id         : data_orden_venta_id,                        
+                        idopcion                    : idopcion,
+                        seguro                       : seguro,
+                    };
+
+        $.confirm({
+            title: '¿Confirma Actualizacion del Monto de Seguro?',
+            content: accion,
+            buttons: {
+                confirmar: function () {
+                    ModificarSeguroOV(data,data_orden_venta_id,_token,idopcion);
+                },
+                cancelar: function () {
+                    debugger;
+                    $.alert('Se cancelo la Actualizacion del Monto de Seguro');
+                    $('.contenedor_ov_detalle .seguro').val(seguroorg);
+                }
+            }
+        });
+
+    });
+
+    function ModificarSeguroOV(data,data_orden_venta_id,_token,idopcion)
+	{
+	    abrircargando();
+	    $.ajax({
+	        type    :   "POST",
+	        url     :   carpeta+'/ajax-actualizar-seguro-orden-venta',
+	        data    :   data,
+	        success: function (data) {
+	            cerrarcargando();
+	            $('.contenedor_ov_detalle').html(data);	            
+	        },
+	        error: function (data) {
+	            cerrarcargando();
+	            error500(data);
+	        }
+	    });   
+	}
 
 
 });
