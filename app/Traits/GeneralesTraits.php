@@ -287,6 +287,36 @@ trait GeneralesTraits
 	 	return  $combo;					 			
 	}
 
+	private function gn_combo_categoria_matserv($tipocategoria,$titulo,$todo) {
+		$array 						= 	DB::table('categorias')
+        								->where('activo','=',1)
+        								->where('tipo_categoria','=',$tipocategoria)
+        								->where('descripcion','<>','BIENES PRODUCIDOS')
+		        						->pluck('descripcion','id')
+										->toArray();
+		if($todo=='TODO'){
+			$combo  				= 	array('' => $titulo , $todo => $todo) + $array;
+		}else{
+			$combo  				= 	array('' => $titulo) + $array;
+		}
+	 	return  $combo;					 			
+	}
+
+	private function gn_combo_categoria_bienprod($tipocategoria,$titulo,$todo) {
+		$array 						= 	DB::table('categorias')
+        								->where('activo','=',1)
+        								->where('tipo_categoria','=',$tipocategoria)
+        								->where('descripcion','=','BIENES PRODUCIDOS')
+		        						->pluck('descripcion','id')
+										->toArray();
+		if($todo=='TODO'){
+			$combo  				= 	array('' => $titulo , $todo => $todo) + $array;
+		}else{
+			$combo  				= 	array('' => $titulo) + $array;
+		}
+	 	return  $combo;					 			
+	}
+
 	private function gn_combo_estadoscompras($titulo,$todo) {
 		$array 						= 	DB::table('categorias')
         								->where('activo','=',1)

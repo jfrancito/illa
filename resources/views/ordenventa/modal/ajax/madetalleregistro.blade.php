@@ -49,7 +49,7 @@
 
 							<input  type="text"
 											id="cantidad" name='cantidad' 
-											value="@if(isset($detalleventa)){{old('cantidad' ,$detalleventa->cantidad)}}@else{{ 1 }}@endif" 
+											value="{{ 1 }}" 
 											placeholder="Cantidad"
 											readonly = "readonly"
 											autocomplete="off" class="form-control input-sm importe" data-aw="2"/>
@@ -57,8 +57,28 @@
 					</div>
 				</div>
 			</div>
+			<div class="preciounitarioov">
+				@include('ordenventa.ajax.apreciounitario')
+			</div>		
+		</div>
+		<div class="separadordiv"></div>
+		<div  class="row regla-modal">
+			<div class="col-xs-6 col-sm-6 col-md-6 col-lg-6">
+				<div class="form-group">
+					<label class="col-sm-12 control-label labelleft negrita" >Total : </label>
+					<div class="col-sm-12">
 
+							<input  type="text"
+											id="total" name='total' 
+											value="{{ 0 }}}" 
+											placeholder="Total"
+											disabled="disabled"
+											autocomplete="off" class="form-control input-sm importe" data-aw="4"/>
 
+					</div>
+				</div>
+			</div>	
+					
 		</div>
 	</div>
 

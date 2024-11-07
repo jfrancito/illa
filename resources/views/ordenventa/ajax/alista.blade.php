@@ -30,18 +30,29 @@
         {{-- <td>{{$item->tipo_venta_nombre}}</td> --}}
         <td>{{$item->moneda_nombre}}</td>
         <td>
-            <span class="obligatorio">{{number_format(count($item->Detalle()), 2)}}</span>
-            {{-- <b>{{number_format(count($item->detalle()), 2)}}</b>   --}}
+          @if(count($item->Detalle)==0)
+            <span class="obligatorio">{{count($item->Detalle)}}</span>            
+          @else
+            <span>{{count($item->Detalle)}}</span>            
+          @endif
         </td>        
         <td>
           @if($item->estado_id=='1CIX00000003')
             <span class="badge badge-light">{{$item->estado_descripcion}}</span>
           @else
-            @if($item->estado_id=='1CIX00000004')
-              <span class="badge badge-success">{{$item->estado_descripcion}}</span><br>
+            @if($item->estado_id=='1CIX00000046' or $item->estado_id=='1CIX00000034')
+              <span class="badge badge-primary">{{$item->estado_descripcion}}</span><br>
             @else
-              @if($item->estado_id=='1CIX00000014')
-                <span class="badge badge-danger">{{$item->estado_descripcion}}</span><br>
+              @if($item->estado_id=='1CIX00000047')
+                <span class="badge badge-warning">{{$item->estado_descripcion}}</span><br>
+              @else
+                @if($item->estado_id=='1CIX00000048')
+                  <span class="badge badge-success">{{$item->estado_descripcion}}</span><br>
+                @else
+                  @if($item->estado_id=='1CIX00000014')
+                    <span class="badge badge-danger">{{$item->estado_descripcion}}</span><br>
+                  @endif
+                @endif
               @endif
             @endif
           @endif
@@ -50,28 +61,47 @@
           <div class="btn-group btn-hspace">
             <button type="button" data-toggle="dropdown" class="btn btn-default dropdown-toggle">Acción <span class="icon-dropdown mdi mdi-chevron-down"></span></button>
             <ul role="menu" class="dropdown-menu pull-right">
-              <li @if($item->estado_id == '1CIX00000014') hidden @endif>
+              <li @if($item->estado_id != '1CIX00000003') hidden @endif>
                 <a href="{{ url('/modificar-orden-ventas/'.$idopcion.'/'.Hashids::encode(substr($item->id, -8))) }}">
                   Modificar
                 </a>  
               </li>
-              <li @if($item->estado_id != '1CIX00000003') hidden @endif>
-                <a href="{{ url('/aprobar-orden-ventas/'.$idopcion.'/'.Hashids::encode(substr($item->id, -8))) }}" class="emitirordenventa" data_codigo = '{{ $item->codigo }}'>
-                  Aprobar
+              <li @if($item->estado_id != '1CIX00000003' or count($item->Detalle) == 0) hidden @endif>
+                <a href="{{ url('/validar-orden-ventas/'.$idopcion.'/'.Hashids::encode(substr($item->id, -8))) }}" class="validarordenventa" data_codigo = '{{ $item->codigo }}'>
+                  Validar
                 </a>  
               </li>
 
-              <li @if($item->estado_id == '1CIX00000003') hidden @endif>
+              <li @if($item->estado_id != '1CIX00000046') hidden @endif>
                 <a href="{{ url('/orden-ventas-esquema-producto/'.$idopcion.'/'.Hashids::encode(substr($item->id, -8))) }}">
                   Produccion
                 </a>  
               </li>
-              <li @if($item->estado_id == '1CIX00000003') hidden @endif>
+              <li @if($item->estado_id != '1CIX00000046') hidden @endif>
                 <a href="{{ url('/orden-ventas-margen-producto/'.$idopcion.'/'.Hashids::encode(substr($item->id, -8))) }}">
                   Margen
                 </a>  
+              </li>              
+              <li @if($item->estado_id != '1CIX00000046') hidden @endif>
+                <a href="{{ url('/aprobar-orden-ventas/'.$idopcion.'/'.Hashids::encode(substr($item->id, -8))) }}" class="aprobarordenventa" data_codigo = '{{ $item->codigo }}'>
+                  Aprobar
+                </a>  
+              </li> 
+              <li @if($item->estado_id != '1CIX00000034') hidden @endif>
+                <a href="{{ url('/comprar-orden-ventas/'.$idopcion.'/'.Hashids::encode(substr($item->id, -8))) }}">
+                  Comprar
+                </a>  
               </li>
-
+              <li @if($item->estado_id != '1CIX00000047') hidden @endif>
+                <a href="{{ url('/facturar-orden-ventas/'.$idopcion.'/'.Hashids::encode(substr($item->id, -8))) }}">
+                  Facturar
+                </a>  
+              </li>              
+              <li @if($item->estado_id == '1CIX00000003') hidden @endif>
+                <a href="{{ url('/resumen-orden-ventas/'.$idopcion.'/'.Hashids::encode(substr($item->id, -8))) }}">
+                  Gestion
+                </a>  
+              </li>
               {{-- <li @if($item->estado_id == '1CIX00000014') hidden @endif>
                 <a href="{{ url('/extornar-orden-ventas/'.$idopcion.'/'.Hashids::encode(substr($item->id, -8))) }}">
                   Extornar

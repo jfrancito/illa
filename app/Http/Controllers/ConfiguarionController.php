@@ -563,7 +563,7 @@ class ConfiguarionController extends Controller {
 	    /******************************************************/
 	    View::share('titulo','Listar Productos');
 
-	    $listaproducto 	= 	$this->con_lista_productos();	    
+	    $listaproducto 	= 	$this->con_lista_matserv();	    
 		$funcion 		= 	$this;
 
 
@@ -656,7 +656,7 @@ class ConfiguarionController extends Controller {
 		    $combo_unidad_medida 	=	$this->gn_combo_categoria('UNIDAD_MEDIDA','Seleccione unidad medida','');
 		    $cod_producto 			=   $this->funciones->getCreateCodCorrelativo('productos',7);
 		    $select_categoria  		=	'';
-		    $combo_categoria 		=	$this->gn_combo_categoria('CAT_PRODUCTO','Seleccione Categoria','');
+		    $combo_categoria 		=	$this->gn_combo_categoria_matserv('CAT_PRODUCTO','Seleccione Categoria','');
 
 			$select_subcategoria  	=	'';
 			$combo_subcategoria		=	[];
@@ -969,6 +969,331 @@ class ConfiguarionController extends Controller {
 
 		$idproductoen								= 	Hashids::encode(substr($productogema->producto_id, -8));
 		 	return Redirect::to('/modificar-productos/'.$idopcion.'/'.$idproductoen)->with('bienhecho', 'Gema'.$productogema->gema_nombre.' quitada con exito');
+		
+	}
+
+	public function actionListarBienProducido($idopcion)
+	{
+
+		/******************* validar url **********************/
+		$validarurl = $this->funciones->getUrl($idopcion,'Ver');
+	    if($validarurl <> 'true'){return $validarurl;}
+	    /******************************************************/
+	    View::share('titulo','Listar Bienes Producidos');
+
+	    $listabienproducido 			= 	$this->con_lista_bienprod();	    
+		$funcion 						= 	$this;
+
+
+		return View::make('configuracion/listabienproducidos',
+						 [
+						 	'listabienproducido' 		=> $listabienproducido,
+						 	'funcion' 					=> $funcion,
+						 	'idopcion' 					=> $idopcion,						 	
+						 ]);
+	}
+	public function actionAgregarBienProducido($idopcion,Request $request)
+	{
+		/******************* validar url **********************/
+		$validarurl = $this->funciones->getUrl($idopcion,'Anadir');
+	    if($validarurl <> 'true'){return $validarurl;}
+	    /******************************************************/
+	    View::share('titulo','Agregar Bienes Producidos');
+		if($_POST)
+		{
+			$this->validate($request, [
+	            'descripcion' => 'unique:productos',
+			], [
+            	'descripcion.unique' => 'Producto ya Registrado',
+        	]);
+
+			$codigo 	 				= 	$request['codigo'];
+			$descripcion 	 			= 	$request['descripcion'];
+			$peso 	 					= 	$request['peso'];
+			$unidad_medida_id	 		= 	$request['unidad_medida_id'];
+			$categoria_id	 			= 	$request['categoria_id'];
+			$subcategoria_id	 		= 	$request['subcategoria_id'];
+			$precio_venta 				=   $request['precio_venta'];
+			$tipo_oro_id	 			= 	$request['tipo_oro_id'];
+			$cantidad_oro 				=   $request['cantidad_oro'];
+					
+			$unidad_medida	 			= 	Categoria::where('id','=',$unidad_medida_id)->first();
+			$categoria_prod	 			= 	Categoria::where('id','=',$categoria_id)->first();
+			$subcategoria_prod	 		= 	Categoria::where('id','=',$subcategoria_id)->first();
+			$tipo_oro			 		= 	Producto::where('id','=',$tipo_oro_id)->first();
+
+			$idproducto 				=   $this->funciones->getCreateIdMaestra('productos');
+			
+			$cabecera            	 			=	new Producto;
+			$cabecera->id 	     	 			=   $idproducto;
+			$cabecera->codigo 					=   $codigo;			
+			$cabecera->descripcion 	   			=   $descripcion;
+
+			
+			$cabecera->categoria_id				=   $categoria_prod->id;
+			$cabecera->categoria_nombre			=   $categoria_prod->descripcion;
+			
+			$cabecera->subcategoria_id			=   $subcategoria_prod->id;
+			$cabecera->subcategoria_nombre		=   $subcategoria_prod->descripcion;
+			// dd($categoria_id);
+			if($categoria_id=='CATP00000003'){
+				$cabecera->indservicio			=	1;
+			}
+			elseif($categoria_id=='CATP00000007'){
+			
+				$cabecera->indproduccion		=	1;
+				$unidad_medida	 					= 	Categoria::where('tipo_categoria','=','UNIDAD_MEDIDA')->where('aux01','=','UND')->first();
+				$cabecera->unidad_medida_id			=   $unidad_medida->id;
+				$cabecera->unidad_medida_nombre 	=   $unidad_medida->descripcion;	
+				$cabecera->precio_venta				=   (float)$precio_venta;
+				$cabecera->tipo_oro_id				=   $tipo_oro->id;
+				$cabecera->tipo_oro_nombre 			=   $tipo_oro->descripcion;	
+				$cabecera->cantidad_oro				=   (float)$cantidad_oro;
+			}
+			else
+			{
+				$unidad_medida	 					= 	Categoria::where('id','=',$unidad_medida_id)->first();
+				$cabecera->unidad_medida_id			=   $unidad_medida->id;
+				$cabecera->unidad_medida_nombre 	=   $unidad_medida->descripcion;	
+			}
+
+			$cabecera->peso			 	 	  	=   (float)$peso;
+			// $cabecera->unidad_medida_id			=   $unidad_medida->id;
+			// $cabecera->unidad_medida_nombre 	=   $unidad_medida->descripcion;			
+
+			$cabecera->fecha_crea 	 			=   $this->fechaactual;
+			$cabecera->usuario_crea 			=   Session::get('usuario')->id;
+			$cabecera->save();
+ 			
+ 			$idproductoen							= 	Hashids::encode(substr($idproducto, -8));
+ 		 	return Redirect::to('/modificar-bien-producidos/'.$idopcion.'/'.$idproductoen)->with('bienhecho', 'Producto '.$descripcion.' registrado con exito');
+
+		}else{
+
+		    $select_unidad_medida  	=	'';
+		    $combo_unidad_medida 	=	$this->gn_combo_categoria('UNIDAD_MEDIDA','Seleccione unidad medida','');
+		    $cod_producto 			=   $this->funciones->getCreateCodCorrelativo('productos',7);
+		    $select_categoria  		=	'CATP00000007';
+		    $combo_categoria 		=	$this->gn_combo_categoria_bienprod('CAT_PRODUCTO','Seleccione Categoria','');
+
+			$select_subcategoria  	=	'SCTP00000005';
+			$combo_subcategoria 	=	Categoria::where('tipo_categoria','SUBCAT_PRODUCTO')
+										->where('aux01','=',$select_categoria)
+										->where('activo','=',1)										
+										->pluck('descripcion','id')->toArray();
+			$select_tipo_oro		=	'';
+			$combo_tipo_oro	 		=	[''=>'SELECCIONE TIPO ORO']+Producto::where('subcategoria_nombre','=','ORO')->where('activo','=',1)->pluck('descripcion','id')->toArray();
+			$combo_gemas			=   array('' => "Seleccione Gema") + Producto::where('subcategoria_nombre','=','GEMAS')->pluck('descripcion','id')->toArray();// + $datos;
+			$select_gemas			=   '';
+			$disabled 				= false;
+		    // $combo_subcategoria 	=	$this->gn_combo_subcategoria('CAT_PRODUCTO','Seleccione Categoria','');
+		    // $combo_subcategoria 	=	$this->gn_combo_subcategoria('CAT_PRODUCTO','Seleccione Categoria','');
+
+			return View::make('configuracion/agregarbienproducidos',
+						[
+							'select_unidad_medida'  	=> $select_unidad_medida,
+							'combo_unidad_medida'   	=> $combo_unidad_medida,	
+							'cod_producto'				=> $cod_producto,						
+							'select_categoria'  		=> $select_categoria,
+							'combo_categoria'   		=> $combo_categoria,	
+							'select_subcategoria'  		=> $select_subcategoria,
+							'combo_subcategoria'   		=> $combo_subcategoria,	
+							'select_tipo_oro'  			=> $select_tipo_oro,
+							'combo_tipo_oro'   			=> $combo_tipo_oro,	
+							'combo_gemas'  				=> $combo_gemas,
+							'select_gemas'   			=> $select_gemas,	
+							'disabled'   				=> $disabled,	
+						  	'idopcion'  			 	=> $idopcion
+						]);
+		}
+	}
+
+	public function actionModificarBienProducido($idopcion,$idproducto,Request $request)
+	{
+
+		/******************* validar url **********************/
+		$validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+	    if($validarurl <> 'true'){return $validarurl;}
+	    /******************************************************/
+	    $idproducto = $this->funciones->decodificarmaestra($idproducto);
+	    View::share('titulo','Modificar Bienes Producidos');
+
+		if($_POST)
+		{
+
+			$codigo 	 						= 	$request['codigo'];
+			$descripcion 	 					= 	$request['descripcion'];
+			$peso 	 							= 	$request['peso'];
+			$unidad_medida_id	 				= 	$request['unidad_medida_id'];
+			$categoria_id	 					= 	$request['categoria_id'];
+			$subcategoria_id	 				= 	$request['subcategoria_id'];
+			$activo 	 		 				= 	$request['activo'];
+			$precio_venta 						=   $request['precio_venta'];
+			$tipo_oro_id	 					= 	$request['tipo_oro_id'];
+			$cantidad_oro 						=   $request['cantidad_oro'];
+			$ocategoria_id 						=   $request['ocategoria_id'];
+
+			$categoria_prod	 					= 	Categoria::where('id','=',$categoria_id)->first();
+			$subcategoria_prod	 				= 	Categoria::where('id','=',$subcategoria_id)->first();
+			$tipo_oro			 				= 	Producto::where('id','=',$tipo_oro_id)->first();
+
+			$cabecera            	 			=	Producto::find($idproducto);
+					
+			if($ocategoria_id=='CATP00000007'){		
+				$cabecera->precio_venta				=   (float)$precio_venta;
+				$cabecera->tipo_oro_id				=   $tipo_oro->id;
+				$cabecera->tipo_oro_nombre 			=   $tipo_oro->descripcion;	
+				$cabecera->cantidad_oro				=   (float)$cantidad_oro;
+			}			
+
+			$cabecera->activo 	 	 			=   $activo;
+			$cabecera->fecha_mod 	 			=   $this->fechaactual;
+			$cabecera->usuario_mod 				=   Session::get('usuario')->id;
+			$cabecera->save();
+
+ 			
+ 			$idproductoen							= 	Hashids::encode(substr($idproducto, -8));
+ 		 	return Redirect::to('/modificar-bien-producidos/'.$idopcion.'/'.$idproductoen)->with('bienhecho', 'Producto '.$descripcion.' registrado con exito');
+
+		}else{
+
+		    $combo_unidad_medida 		=	$this->gn_combo_categoria('UNIDAD_MEDIDA','Seleccione unidad medida','');
+			$producto 					= 	Producto::where('id', $idproducto)->first();
+
+			$listaproductogema			= 	ProductoGema::where('activo','=',1)
+												->where('producto_id','=',$idproducto)
+												->orderby('gema_nombre','asc')->get();
+			
+			$select_unidad_medida 		= 	$producto->unidad_medida_id;
+		    
+  			$select_categoria  			=	$producto->categoria_id;
+		    $combo_categoria 			=	$this->gn_combo_categoria('CAT_PRODUCTO','Seleccione Categoria','');
+			
+			$select_subcategoria  		=	$producto->subcategoria_id;
+		    $combo_subcategoria 		=	Categoria::where('id',$producto->subcategoria_id)->pluck('descripcion','id')->toArray()
+											+
+											Categoria::where('tipo_categoria','SUBCAT_PRODUCTO')
+												->where('aux01','=',$producto->categoria_id)
+												->where('activo','=',1)
+												->whereNotIn('id',[$producto->subcategoria_id])
+												->pluck('descripcion','id')->toArray();
+
+			$select_tipo_oro			=	$producto->tipo_oro_id;
+			$combo_tipo_oro	 			=	[''=>'SELECCIONE TIPO ORO']+Producto::where('subcategoria_nombre','=','ORO')->where('activo','=',1)->pluck('descripcion','id')->toArray();
+			$combo_gemas		=   array('' => "Seleccione Gema") + Producto::where('subcategoria_nombre','=','GEMAS')->pluck('descripcion','id')->toArray();// + $datos;
+			$select_gemas		=   '';
+			$disabled 			= true;
+
+	        return View::make('configuracion/modificarbienproducido', 
+	        				[
+	        					'combo_unidad_medida'  		=> $combo_unidad_medida,
+	        					'producto'  				=> $producto,
+	        					'listaproductogema'  		=> $listaproductogema,
+		        				'select_unidad_medida' 		=> $select_unidad_medida,
+		        				'select_categoria'			=> $select_categoria,
+		        				'combo_categoria'			=> $combo_categoria,
+		        				'select_subcategoria'		=> $select_subcategoria,
+		        				'combo_subcategoria'		=> $combo_subcategoria,
+		        				'select_tipo_oro'			=> $select_tipo_oro,
+		        				'combo_tipo_oro'			=> $combo_tipo_oro,
+		        				'combo_gemas'				=> $combo_gemas,
+		        				'select_gemas'				=> $select_gemas,
+		        				'disabled'   				=> $disabled,	
+					  			'idopcion' 					=> $idopcion
+	        				]);
+		}
+	}
+
+	public function actionAjaxSubCategoriasBienProducido(Request $request)
+	{
+		$categoria_id			=	$request['categoria_id'];
+		$select_subcategoria  	=	'';
+		$combo_subcategoria		=	Categoria::where('tipo_categoria','=','SUBCAT_PRODUCTO')->where('activo','=',1)->where('aux01','=',$categoria_id)->pluck('descripcion','id')->toArray();
+		$disabled 				=	false;
+		return View::make('configuracion/ajax/asubcategoriaproducto',
+						[
+							'select_subcategoria'  		=> $select_subcategoria,
+							'combo_subcategoria'   		=> $combo_subcategoria,	
+							'disabled'   				=> $disabled,	
+						  	'ajax'						=>	true,
+						]);
+	}
+
+	public function actionAjaxModalBienProducidoGema(Request $request)
+	{
+		$producto_id 	 = 	$request['producto_id'];
+		$idopcion 		 = 	$request['idopcion'];
+
+		$producto 							= 	Producto::where('id', $producto_id)->first();		
+		$producto_nombre					=	$producto->descripcion;
+		//$opcionproducto 					=	Opcion::where('nombre','=','Productos')->where('activo','=',1)->first();
+		//$idopcionproducto 					=	($opcionproducto) ? Hashids::encode(substr($opcionproducto->id,-8)) : '';
+		$combo_gemas		=   array('' => "Seleccione Gema") + Producto::where('subcategoria_nombre','=','GEMAS')->pluck('descripcion','id')->toArray();// + $datos;
+		$select_gemas		=   '';
+		
+		//dd($combo_producto);
+		
+		return View::make('configuracion/modal/ajax/mabienproducidogema',
+						 [		 	
+						 	'producto_id' 				=> $producto_id,						 	
+						 	'producto_nombre' 			=> $producto_nombre,						 	
+						 	'select_gemas' 				=> $select_gemas,
+						 	'combo_gemas' 				=> $combo_gemas,
+						 	'idopcion' 					=> $idopcion,						 	
+						 	'ajax' 						=> true,						 	
+						 ]);
+	}
+
+	public function actionAgregarBienProducidoGema($idopcion,$idproducto,Request $request)
+	{
+		/******************* validar url **********************/
+		$validarurl = $this->funciones->getUrl($idopcion,'Anadir');
+	    if($validarurl <> 'true'){return $validarurl;}
+	    /******************************************************/
+
+	    $idproducto = $this->funciones->decodificarmaestra($idproducto);		
+
+	    $gema_id	 							= 	$request['tipogema_id'];
+	    $cantidad	 							= 	$request['cantidad'];
+
+		$producto	 							= 	Producto::where('id','=',$idproducto)->first();
+		$gema	 								= 	Producto::where('id','=',$gema_id)->first();				
+
+		$idproductogema 						=   $this->funciones->getCreateIdMaestra('productogemas');
+		
+		$productogema            	 			=	new ProductoGema;
+		$productogema->id 	     	 			=   $idproductogema;
+		$productogema->producto_id 	     	 	=   $producto->id;
+		$productogema->producto_nombre 			=   $producto->descripcion;			
+		$productogema->gema_id 	   				=   $gema->id;
+		$productogema->gema_nombre			 	=   $gema->descripcion;		
+		$productogema->cantidad			 		=   $cantidad;
+		$productogema->fecha_crea 	 			=   $this->fechaactual;
+		$productogema->usuario_crea 			=   Session::get('usuario')->id;
+		$productogema->save();				
+
+		$idproductoen							= 	Hashids::encode(substr($idproducto, -8));
+ 		 	return Redirect::to('/modificar-bien-producidos/'.$idopcion.'/'.$idproductoen)->with('bienhecho', 'Gema'.$gema->descripcion.' registrada con exito');		
+	}
+
+	public function actionQuitarBienProducidoGema($idopcion,$idproductogema,Request $request)
+	{
+		/******************* validar url **********************/
+		$validarurl = $this->funciones->getUrl($idopcion,'Modificar');
+	    if($validarurl <> 'true'){return $validarurl;}
+	    /******************************************************/
+	    $idproductogema = $this->funciones->decodificarmaestra($idproductogema);		
+					
+		$activo			 						= 	0;
+
+		$productogema            	 			=	ProductoGema::find($idproductogema);
+		$productogema->activo 					=   $activo;					
+		$productogema->fecha_mod 	 			=   $this->fechaactual;
+		$productogema->usuario_mod 				=   Session::get('usuario')->id;
+		$productogema->save();
+
+		$idproductoen								= 	Hashids::encode(substr($productogema->producto_id, -8));
+		 	return Redirect::to('/modificar-bien-producidos/'.$idopcion.'/'.$idproductoen)->with('bienhecho', 'Gema'.$productogema->gema_nombre.' quitada con exito');
 		
 	}
 

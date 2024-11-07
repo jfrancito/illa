@@ -15,7 +15,7 @@
       <div class="col-md-12">
         <div class="panel panel-default panel-border-color panel-border-color-primary">
           <div class="panel-heading panel-heading-divider">Producto
-          <div class="tools tooltiptop" hidden>
+          <div class="tools tooltiptop">
             <a href="#" class="tooltipcss opciones agregaproductogema"
               data_producto_id = '{{$producto->id}}'>                            
               <span class="tooltiptext">Agregar gema</span>
@@ -23,18 +23,18 @@
             </a>
           </div>
           <input type="hidden" name="idopcion" id='idopcion' value='{{$idopcion}}'>
-          <span class="panel-subtitle">Modificar Producto : {{$producto->nombre_razonsocial}}</span></div>
+          <span class="panel-subtitle">Modificar Bien Producido : {{$producto->nombre_razonsocial}}</span></div>
           <div class="panel-body">
-            <form method="POST" id='formagregarproducto' action="{{ url('/modificar-productos/'.$idopcion.'/'.Hashids::encode(substr($producto->id, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed formagregarproducto">
+            <form method="POST" id='formagregarproducto' action="{{ url('/modificar-bien-producidos/'.$idopcion.'/'.Hashids::encode(substr($producto->id, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed formagregarproducto">
                   {{ csrf_field() }}
-              @include('configuracion.form.fproducto')
+              @include('configuracion.form.fbienproducido')
             </form>
           </div>
         </div>
       </div>
     </div>
   </div>
-  @include('configuracion.modal.mproductogema')
+  @include('configuracion.modal.mbienproducidogema')
 </div>  
 
 
@@ -86,6 +86,6 @@
       });
     </script> 
 
-    <script src="{{ asset('public/js/configuracion/producto.js?v='.$version) }}" type="text/javascript"></script>
+    <script src="{{ asset('public/js/configuracion/bienproducido.js?v='.$version) }}" type="text/javascript"></script>
 
 @stop

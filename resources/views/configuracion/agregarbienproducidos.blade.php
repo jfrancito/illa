@@ -7,34 +7,23 @@
 @stop
 @section('section')
 
-<div class="be-content producto">
+<div class="be-content">
   <div class="main-content container-fluid">
-
     <!--Basic forms-->
     <div class="row">
       <div class="col-md-12">
         <div class="panel panel-default panel-border-color panel-border-color-primary">
-          <div class="panel-heading panel-heading-divider">Producto
-          <div class="tools tooltiptop" hidden>
-            <a href="#" class="tooltipcss opciones agregaproductogema"
-              data_producto_id = '{{$producto->id}}'>                            
-              <span class="tooltiptext">Agregar gema</span>
-              <span class="icon mdi mdi-plus-circle-o"></span>              
-            </a>
-          </div>
-          <input type="hidden" name="idopcion" id='idopcion' value='{{$idopcion}}'>
-          <span class="panel-subtitle">Modificar Producto : {{$producto->nombre_razonsocial}}</span></div>
+          <div class="panel-heading panel-heading-divider">Agregar Bien Producido<span class="panel-subtitle">Crear un nuevo bien producido</span></div>
           <div class="panel-body">
-            <form method="POST" id='formagregarproducto' action="{{ url('/modificar-productos/'.$idopcion.'/'.Hashids::encode(substr($producto->id, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed formagregarproducto">
+            <form method="POST" action="{{ url('/agregar-bien-producidos/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed formagregarproducto">
                   {{ csrf_field() }}
-              @include('configuracion.form.fproducto')
+              @include('configuracion.form.fbienproducido')
             </form>
           </div>
         </div>
       </div>
     </div>
   </div>
-  @include('configuracion.modal.mproductogema')
 </div>  
 
 
@@ -43,11 +32,13 @@
 
 @section('script')
 
+
     <script src="{{ asset('public/js/general/inputmask/inputmask.js') }}" type="text/javascript"></script> 
     <script src="{{ asset('public/js/general/inputmask/inputmask.extensions.js') }}" type="text/javascript"></script> 
     <script src="{{ asset('public/js/general/inputmask/inputmask.numeric.extensions.js') }}" type="text/javascript"></script> 
     <script src="{{ asset('public/js/general/inputmask/inputmask.date.extensions.js') }}" type="text/javascript"></script> 
     <script src="{{ asset('public/js/general/inputmask/jquery.inputmask.js') }}" type="text/javascript"></script>
+
 
     <script src="{{ asset('public/lib/jquery-ui/jquery-ui.min.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/lib/jquery.nestable/jquery.nestable.js') }}" type="text/javascript"></script>
@@ -59,14 +50,9 @@
     <script src="{{ asset('public/lib/parsley/parsley.js') }}" type="text/javascript"></script>
     <script src="{{ asset('public/lib/jquery.niftymodals/dist/jquery.niftymodals.js') }}" type="text/javascript"></script>
 
+
+
     <script type="text/javascript">
-
-      $.fn.niftyModal('setDefaults',{
-        overlaySelector: '.modal-overlay',
-        closeSelector: '.modal-close',
-        classAddAfterOpen: 'modal-show',
-      });
-
       $(document).ready(function(){
         //initialize the javascript
         App.init();
@@ -78,14 +64,12 @@
         'digitsOptional': false, 
         'prefix': '', 
         'placeholder': '0'});
-
-        
-
-
-
+        $('.formagregarproducto .datosproducto').hide();
+        $('.formagregarproducto .datosbienesproducidos').hide();
+        $('.formagregarproducto .datosproductogemas').hide();
       });
     </script> 
 
-    <script src="{{ asset('public/js/configuracion/producto.js?v='.$version) }}" type="text/javascript"></script>
+    <script src="{{ asset('public/js/configuracion/bienproducido.js?v='.$version) }}" type="text/javascript"></script>
 
 @stop

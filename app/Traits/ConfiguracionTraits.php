@@ -124,6 +124,18 @@ trait ConfiguracionTraits
 	 	return  $producto;
 	}
 
+	private function con_lista_matserv() {
+		$producto 	= 	Producto::where('categoria_id','<>','CATP00000007')
+						->get();
+	 	return  $producto;
+	}
+
+	private function con_lista_bienprod() {
+		$producto 	= 	Producto::where('categoria_id','=','CATP00000007')
+						->get();
+	 	return  $producto;
+	}
+
 	private function con_lista_compras() {
 		$compra 	= 	Compra::get();
 	 	return  $compra;
