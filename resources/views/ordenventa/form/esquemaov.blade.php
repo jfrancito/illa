@@ -104,7 +104,9 @@
 									<th>CANT</th>
 									<th>PRECIO</th>
 									<th>COSTO</th>
-									<th>ACCION</th>
+									@if($swresumen == false)
+										<th>ACCION</th>
+									@endif									
 								</tr>
 							</thead>
 							
@@ -119,18 +121,28 @@
 										<td class='tdcantidad'>{{$gema->cantidad}} </td>
 										<td class='tdcosto'>{{$gema->costo_unitario}}</td>
 										<td class='tdcosto'>{{$gema->costo_total}}</td>
-										<td>
-											<button type='button' class='eliminargema btn btn-default btn-sm' aria-label='Left Align'>
-												<span class='glyphicon glyphicon-remove' aria-hidden='true'></span>
-											</button>
-										</td>
+										@if($swresumen == false)
+											<td>
+												<button type='button' class='eliminargema btn btn-default btn-sm' gema_esquema_id = "{{$gema->id}}" 
+											 		esquema_id = "{{$item->id}}" aria-label='Left Align'>
+													<span class='glyphicon glyphicon-remove' aria-hidden='true'></span>			
+												</button>
+											</td>
+										@endif
 									</tr>
 								@endforeach
 							</tbody>
 							<tfooter>
 								<th colspan="4" class="tdderecha">TOTAL COSTO GEMAS: </th>
 								<th id='tdtotal_costo_gemas' name='tdtotal_costo_gemas'>{{$item->costo_total_gemas}}</th>
-								<th></th>
+								@if($swresumen == false)
+									<th>
+										<button type='button' class='agregargema btn btn-success btn-sm'
+												esquema_id = "{{$item->id}}" aria-label='Left Align'>
+											<span class='glyphicon glyphicon-plus' aria-hidden='true'></span>			
+										</button>
+									</th>
+								@endif
 							</tfooter>
 						</table>
 					</div>
@@ -205,12 +217,12 @@
 				<a href="{{ url('/gestion-orden-venta/'.$idopcion) }}">
 					<button type="button" class="btn btn-space btn-danger btnatras" >Cancelar</button>
 				</a>
-				<button id='btnguardarregistroesquema' type="submit" class="btn btn-space btn-primary btnguardarregistroesquema">Guardar</button>
+				<button id='btnguardarregistroesquema' type="submit" class="btn btn-space btn-primary btnguardarregistroesquema" @if($swresumen == true) disabled @endif>Guardar</button>
 			@else
 				<a href="{{ url('/gestion-orden-venta/'.$idopcion) }}">
 					<button type="button" class="btn btn-space btn-danger btnatras" >Cancelar</button>
 				</a>
-				<button id='btnguardarregistroesquema' type="submit" class="btn btn-space btn-primary btnguardarregistroesquema">Guardar</button>
+				<button id='btnguardarregistroesquema' type="submit" class="btn btn-space btn-primary btnguardarregistroesquema" @if($swresumen == true) disabled @endif>Guardar</button>
 			@endif      
 		</p>
 	</div>

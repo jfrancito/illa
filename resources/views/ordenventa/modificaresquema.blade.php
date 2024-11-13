@@ -30,7 +30,12 @@
     </div>
   </div>
 
+  <div class='modalagregardetallegema'>
+    @include('ordenventa.modal.magregardetalleregistro')
+  </div>
   @include('ordenventa.modal.mdetalleregistro')
+  @include('ordenventa.modal.meliminardetalleregistro')
+  
 
 </div>  
 @stop

@@ -103,6 +103,48 @@ $(document).ready(function(){
                   "modal-detalle-registro","modal-detalle-registro-container");
 
     });
+
+    $(".venta").on('click','.eliminargema', function() {		    	
+		var _token                  =   $('#token').val();
+        var gema_esquema_id         =   $(this).attr('gema_esquema_id');
+        var esquema_id              =   $(this).attr('esquema_id');
+        var ordenventa_id           =   $('#ordenventa_id').val();
+
+        var idopcion                =   $('#idopcion').val();
+
+        debugger;
+
+        data                        =   {
+                                            _token                  : _token,
+                                            gema_esquema_id         : gema_esquema_id,
+                                            esquema_id              : esquema_id,
+                                            ordenventa_id           : ordenventa_id,
+                                            idopcion                : idopcion,
+                                        };
+
+        ajax_modal(data,"/ajax-modal-eliminar-detalle-gema-esquema",
+                  "modal-eliminar-detalle-registro","modal-eliminar-detalle-registro-container");    
+	});
+
+	$(".venta").on('click','.agregargema', function() {		    	
+		var _token                  =   $('#token').val();        
+        var esquema_id              =   $(this).attr('esquema_id');
+        var ordenventa_id           =   $('#ordenventa_id').val();
+
+        var idopcion                =   $('#idopcion').val();
+
+        debugger;
+
+        data                        =   {
+                                            _token                  : _token,                                            
+                                            esquema_id              : esquema_id,
+                                            ordenventa_id           : ordenventa_id,
+                                            idopcion                : idopcion,
+                                        };
+
+        ajax_modal(data,"/ajax-modal-agregar-detalle-gema-esquema",
+                  "modal-agregar-detalle-registro","modal-agregar-detalle-registro-container");    
+	});
  
 
 
@@ -199,11 +241,6 @@ $(document).ready(function(){
 		CalcularTotalCosto();
 		limpiarcontrolesgema();
 	});
-
-	$("#listagemas").on('click','.eliminargema', function() {
-			$(this).closest('tr').remove();
-			CalcularTotalCosto();
-	})
 
 	function validarValores() {
 	    let esValido = true;
@@ -442,6 +479,26 @@ $(document).ready(function(){
 		if(cantidad ==''){ alerterrorajax("Ingrese una cantidad."); return false;}
 		if(preciounitario =='0.00'){ alerterrorajax("Ingrese un precio unitario mayor a 0."); return false;}
 		if(cantidad =='0.00'){ alerterrorajax("Ingrese una cantidad mayor a 0."); return false;}
+
+
+		return true;
+
+	});
+
+	$(".modalagregardetallegema").on('click','.btn-agregar-detalle-gema', function() {
+
+		var tipogema_id                 =   $('#tipogema_id').val();
+		var origen_id                  	=   $('#origen_id').val();
+		var cantidad               		=   $('#cantidad').val();
+		var precio                     	=   $('#precio').val();
+
+		//validacioones
+		if(tipogema_id ==''){ alerterrorajax("Seleccione un Tipo Gema."); return false;}
+		if(origen_id ==''){ alerterrorajax("Seleccione un Origen."); return false;}
+		if(cantidad ==''){ alerterrorajax("Ingrese una cantidad."); return false;}
+		if(precio ==''){ alerterrorajax("Ingrese un precio."); return false;}
+		if(cantidad =='0.00'){ alerterrorajax("Ingrese una cantidad mayor a 0."); return false;}
+		if(precio =='0.00'){ alerterrorajax("Ingrese un precio mayor a 0."); return false;}
 
 
 		return true;

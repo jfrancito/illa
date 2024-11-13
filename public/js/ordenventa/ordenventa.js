@@ -21,9 +21,32 @@ $(document).ready(function(){
 	    });
 	}
 	
-	$(".listaventa").on('click', '.emitirordenventa', function(event) {
+	$(".listaventa").on('click', '.validarordenventa', function(event) {
 	    event.preventDefault(); // Evita la navegación automática del enlace
+	    debugger;
+	    var href = $(this).attr('href'); // Obtiene la URL del enlace
+	    var codigo = $(this).attr('data_codigo'); // Obtiene el código de la orden de venta
 	    
+	    $.confirm({
+	        title: '¿Confirma la Validación?',
+	        content: 'Confirmar Valicación de Orden de Venta ' + codigo,
+	        buttons: {
+	            confirmar: function () {
+	                abrircargando('VALIDANDO ORDEN DE VENTA'); // Muestra el cargando
+	                window.location.href = href; // Redirige a la URL original
+	            },
+	            cancelar: function () {
+	                $.alert('Se canceló la validación'); // Muestra un mensaje de cancelación
+	            }
+	        }
+	    });
+	    
+	    return false; // Evita la navegación inmediata del enlace
+	});
+
+	$(".listaventa").on('click', '.aprobarordenventa', function(event) {
+	    event.preventDefault(); // Evita la navegación automática del enlace
+	    debugger;
 	    var href = $(this).attr('href'); // Obtiene la URL del enlace
 	    var codigo = $(this).attr('data_codigo'); // Obtiene el código de la orden de venta
 	    
@@ -266,6 +289,32 @@ $(document).ready(function(){
 		});
 	});
 
+	$(".compra").on('change','#tipo_comprobante_id', function() {
+        
+        var tipo_comprobante_id = $('#tipo_comprobante_id').val();
+        var _token              = $('#token').val();
+
+        // if(tipo_comprobante_id!='1CIX00000018'){return false;}
+
+        $.ajax({
+            
+            type    :   "POST",
+            url     :   carpeta+"/ajax-genera-nota-pedido",
+            data    :   {
+                            _token  : _token,
+                            tipo_comprobante_id : tipo_comprobante_id
+                        },
+            success: function (data) {
+
+                $(".ajaxnotapedido").html(data);
+            },
+            error: function (data) {
+
+                console.log('Error:', data);
+            }
+        });
+    });
+
 	$(".listaventa").on('click','.buscarlistaventa', function() {
 		
 		event.preventDefault();
@@ -316,7 +365,10 @@ $(document).ready(function(){
         var accion          				=   'Desea Actualizar el Monto de Envio de : ' + envioorg + ' a '+envio+ ' ?';
         var _token                      	=   $('#token').val();
         var idopcion                    	=   $('#idopcion').val();        
-        var data_orden_venta_id          	=   $(this).attr('data_orden_venta_id');        
+        var data_orden_venta_id          	=   $(this).attr('data_orden_venta_id');
+        var ov_estado_id      				=   $(this).attr('data_orden_venta_estado_id');		
+		
+		if(ov_estado_id !='1CIX00000003'){ alerterrorajax("No puede modificar una Orden de Venta en estado Emitido."); return false;}	
      
         data    =   {
                         _token                      : _token,
@@ -369,6 +421,9 @@ $(document).ready(function(){
         var _token                      	=   $('#token').val();
         var idopcion                    	=   $('#idopcion').val();        
         var data_orden_venta_id          	=   $(this).attr('data_orden_venta_id');        
+        var ov_estado_id      				=   $(this).attr('data_orden_venta_estado_id');		
+		
+		if(ov_estado_id !='1CIX00000003'){ alerterrorajax("No puede modificar una Orden de Venta en estado Emitido."); return false;}	
      
         data    =   {
                         _token                      : _token,
@@ -421,6 +476,9 @@ $(document).ready(function(){
         var _token                      	=   $('#token').val();
         var idopcion                    	=   $('#idopcion').val();        
         var data_orden_venta_id          	=   $(this).attr('data_orden_venta_id');        
+        var ov_estado_id      				=   $(this).attr('data_orden_venta_estado_id');		
+		
+		if(ov_estado_id !='1CIX00000003'){ alerterrorajax("No puede modificar una Orden de Venta en estado Emitido."); return false;}	
      
         data    =   {
                         _token                      : _token,
@@ -463,6 +521,31 @@ $(document).ready(function(){
 	        }
 	    });   
 	}
+
+	$('.ordenventa').on('change','#producto_id',function(event){
+		debugger;
+
+		var producto_id	=	$('#producto_id').val();
+		var _token      =	$('#token').val();		
+
+		$.ajax({
+			
+			type    :   "POST",
+			url     :   carpeta+"/ajax-cargar-preciounitario-producto",
+			data    :   {
+							_token  : _token,
+							producto_id : producto_id
+						},
+			success: function (data) {
+				$(".ordenventa .preciounitarioov").html(data);
+				CalcularImporteDetalleCompra()
+			},
+			error: function (data) {
+
+				console.log('Error:', data);
+			}
+		});
+	});
 
 
 });

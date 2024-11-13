@@ -101,12 +101,12 @@
 				<a href="{{ url('/gestion-orden-venta/'.$idopcion) }}">
 					<button type="button" class="btn btn-space btn-danger btnatras" >Cancelar</button>
 				</a>
-				<button id='btnguardarregistroesquema' type="submit" class="btn btn-space btn-primary btnguardarregistroesquema">Guardar</button>
+				<button id='btnguardarregistroesquema' type="submit" class="btn btn-space btn-primary btnguardarregistroesquema" @if($swresumen == true) disabled @endif>Guardar</button>
 			@else
 				<a href="{{ url('/gestion-orden-venta/'.$idopcion) }}">
 					<button type="button" class="btn btn-space btn-danger btnatras" >Cancelar</button>
 				</a>
-				<button id='btnguardarregistroesquema' type="submit" class="btn btn-space btn-primary btnguardarregistroesquema">Guardar</button>
+				<button id='btnguardarregistroesquema' type="submit" class="btn btn-space btn-primary btnguardarregistroesquema" @if($swresumen == true) disabled @endif>Guardar</button>
 			@endif      
 		</p>
 	</div>

@@ -92,12 +92,15 @@ trait OrdenVentaTraits
 		$esquemaproducto 	  = EsquemaProducto::where('id','=',$esquema_id)->first();
 		$ctdetesquemaproducto = DetalleEsquemaProducto::where('esquemaproducto_id','=',$esquema_id)->where('activo','=','1')->sum('costo_total');
 
+		$candetesquemaproducto = DetalleEsquemaProducto::where('esquemaproducto_id','=',$esquema_id)->where('activo','=','1')->sum('cantidad');
+
 		$costo_unitario  	  =	$esquemaproducto->costo_total_oro + $ctdetesquemaproducto + $esquemaproducto->precio_total_engaste;
 
 		EsquemaProducto::where('id','=',$esquema_id)
 							->update(
 								[
 									'costo_total_gemas'=>$ctdetesquemaproducto,
+									'cantidad_total_gemas'=>$candetesquemaproducto,
 									'costo_unitario'=>$costo_unitario,
 									'costo_unitario_igv'=>$costo_unitario,
 									'fecha_mod'=>$this->fechaactual,

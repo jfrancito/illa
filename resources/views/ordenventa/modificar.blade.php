@@ -7,7 +7,7 @@
 @stop
 @section('section')
 
-<div class="be-content venta">
+<div class="be-content venta ordenventa">
   <div class="main-content container-fluid">
 
     <!--Basic forms-->
@@ -24,7 +24,7 @@
             </a>
           </div>
           <input type="hidden" name="idopcion" id='idopcion' value='{{$idopcion}}'>
-          <span class="panel-subtitle">Modificar Orden Venta : {{$registro->serie}} - {{$registro->numero}}</span></div>
+          <span class="panel-subtitle">Modificando Orden Venta</span></div>
           <div class="panel-body">
             <form method="POST" action="{{ url('/modificar-orden-ventas/'.$idopcion.'/'.Hashids::encode(substr($registro->id, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                   {{ csrf_field() }}
@@ -85,6 +85,5 @@
       });
     </script> 
 
-    <script src="{{ asset('public/js/ordenventa/ordenventa.js?v='.$version) }}" type="text/javascript"></script>
-
+    <script src="{{ asset('public/js/ordenventa/ordenventa.js?v='.$version) }}" type="text/javascript"></script>    
 @stop
