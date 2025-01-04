@@ -193,6 +193,7 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-modal-producto-gema', 'ConfiguarionController@actionAjaxModalProductoGema');
 	Route::any('/guardar-producto-gema/{idopcion}/{idproducto}', 'ConfiguarionController@actionAgregarProductoGema');	
 	Route::any('/quitar-producto-gema/{idopcion}/{idproductogema}', 'ConfiguarionController@actionQuitarProductoGema');	
+	Route::any('/ajax-gestion-de-productos-filtro', 'ConfiguarionController@actionAjaxProductoFiltro');
 
 	//GESTION DE BIEN PRODUCIDOS
 	Route::any('/gestion-de-bien-producidos/{idopcion}', 'ConfiguarionController@actionListarBienProducido');
@@ -201,7 +202,8 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/ajax-cargar-sub-categorias-bien-producidos', 'ConfiguarionController@actionAjaxSubCategoriasBienProducido');
 	Route::any('/ajax-modal-bien-producido-gema', 'ConfiguarionController@actionAjaxModalBienProducidoGema');
 	Route::any('/guardar-bien-producido-gema/{idopcion}/{idproducto}', 'ConfiguarionController@actionAgregarBienProducidoGema');
-	Route::any('/quitar-bien-producido-gema/{idopcion}/{idproductogema}', 'ConfiguarionController@actionQuitarBienProducidoGema');	
+	Route::any('/quitar-bien-producido-gema/{idopcion}/{idproductogema}', 'ConfiguarionController@actionQuitarBienProducidoGema');
+	Route::any('/ajax-gestion-de-bien-producidos-filtro', 'ConfiguarionController@actionAjaxBienProducidoFiltro');	
 
 	//GESTION DE COMPRAS
 	Route::any('/gestion-de-compras/{idopcion}', 'CompraController@actionListarCompras');

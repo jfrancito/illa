@@ -1,5 +1,5 @@
 <fieldset class="scheduler-border">
-	<legend class="scheduler-border">Datos de la Orden de Venta</legend>
+	<legend class="scheduler-border">Datos de Pedido Shopify</legend>
 		<div class="control-group">
 
 			@if($swmodificar==true)

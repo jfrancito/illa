@@ -14,7 +14,7 @@
     <div class="row">
       <div class="col-md-12">
         <div class="panel panel-default panel-border-color panel-border-color-primary">
-          <div class="panel-heading panel-heading-divider">Orden Venta
+          <div class="panel-heading panel-heading-divider">Pedido Shopify
           <div class="tools tooltiptop">
             <a href="#" class="tooltipcss opciones agregadetalleregistro"
               data_registro_id = '{{$registro->id}}'
@@ -24,7 +24,7 @@
             </a>
           </div>
           <input type="hidden" name="idopcion" id='idopcion' value='{{$idopcion}}'>
-          <span class="panel-subtitle">Modificando Orden Venta</span></div>
+          <span class="panel-subtitle">Modificando Pedido Shopify</span></div>
           <div class="panel-body">
             <form method="POST" action="{{ url('/modificar-orden-ventas/'.$idopcion.'/'.Hashids::encode(substr($registro->id, -8))) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                   {{ csrf_field() }}

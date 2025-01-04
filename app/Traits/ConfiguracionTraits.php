@@ -130,8 +130,22 @@ trait ConfiguracionTraits
 	 	return  $producto;
 	}
 
+	private function con_lista_matserv_activo($activo) {
+		$producto 	= 	Producto::where('categoria_id','<>','CATP00000007')
+						->where('activo','=',$activo)
+						->get();
+	 	return  $producto;
+	}
+
 	private function con_lista_bienprod() {
 		$producto 	= 	Producto::where('categoria_id','=','CATP00000007')
+						->get();
+	 	return  $producto;
+	}
+
+	private function con_lista_bienprod_activo($activo) {
+		$producto 	= 	Producto::where('categoria_id','=','CATP00000007')
+						->where('activo','=',$activo)
 						->get();
 	 	return  $producto;
 	}

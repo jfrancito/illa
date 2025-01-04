@@ -13,7 +13,7 @@
     <div class="row">
       <div class="col-md-12">
         <div class="panel panel-default panel-border-color panel-border-color-primary">
-          <div class="panel-heading panel-heading-divider">Comprar Orden Venta
+          <div class="panel-heading panel-heading-divider">Comprar Pedido Shopify
 
             <span class="panel-subtitle">Crear un nuevo compra</span>
           </div>

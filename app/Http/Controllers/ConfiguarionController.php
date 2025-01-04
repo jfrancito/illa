@@ -414,14 +414,13 @@ class ConfiguarionController extends Controller {
 	    View::share('titulo','Listar Proveedores');
 
 	    $listaproveedor 	= 	$this->con_lista_proveedores();	    
-		$funcion 		= 	$this;
-
+		$funcion 			= 	$this;
 
 		return View::make('configuracion/listaproveedores',
 						 [
 						 	'listaproveedor' 		=> $listaproveedor,
 						 	'funcion' 				=> $funcion,
-						 	'idopcion' 				=> $idopcion,						 	
+						 	'idopcion' 				=> $idopcion,						 							 	
 						 ]);
 	}
 	public function actionAgregarProveedores($idopcion,Request $request)
@@ -562,16 +561,19 @@ class ConfiguarionController extends Controller {
 	    if($validarurl <> 'true'){return $validarurl;}
 	    /******************************************************/
 	    View::share('titulo','Listar Productos');
-
-	    $listaproducto 	= 	$this->con_lista_matserv();	    
+	    
+		$combo_activo   =   array('' => 'Seleccione estado' , '1' => 'Activo', '0' => 'Inactivo');
+        $select_activo 	=   1;
+        $listaproducto 	= 	$this->con_lista_matserv_activo($select_activo);	    
 		$funcion 		= 	$this;
-
 
 		return View::make('configuracion/listaproductos',
 						 [
 						 	'listaproducto' 		=> $listaproducto,
 						 	'funcion' 				=> $funcion,
 						 	'idopcion' 				=> $idopcion,						 	
+						 	'combo_activo' 			=> $combo_activo,
+						 	'select_activo' 		=> $select_activo
 						 ]);
 	}
 	public function actionAgregarProductos($idopcion,Request $request)
@@ -647,8 +649,7 @@ class ConfiguarionController extends Controller {
 			$cabecera->usuario_crea 			=   Session::get('usuario')->id;
 			$cabecera->save();
  			
- 			$idproductoen							= 	Hashids::encode(substr($idproducto, -8));
- 		 	return Redirect::to('/modificar-productos/'.$idopcion.'/'.$idproductoen)->with('bienhecho', 'Producto '.$descripcion.' registrado con exito');
+ 			return Redirect::to('/gestion-de-productos/'.$idopcion)->with('bienhecho', 'Producto '.$descripcion.' registrado con exito');
 
 		}else{
 
@@ -731,8 +732,7 @@ class ConfiguarionController extends Controller {
 			$cabecera->save();
 
  			
- 			$idproductoen							= 	Hashids::encode(substr($idproducto, -8));
- 		 	return Redirect::to('/modificar-productos/'.$idopcion.'/'.$idproductoen)->with('bienhecho', 'Producto '.$descripcion.' registrado con exito');
+ 			return Redirect::to('/gestion-de-productos/'.$idopcion)->with('bienhecho', 'Producto '.$descripcion.' registrado con exito');
 
 		}else{
 
@@ -972,6 +972,22 @@ class ConfiguarionController extends Controller {
 		
 	}
 
+	public function actionAjaxProductoFiltro(Request $request)
+	{
+
+		$activo			=	$request['activo'];		
+		$idopcion		=	$request['idopcion'];
+
+		$listaproducto 	= 	$this->con_lista_matserv_activo($activo);
+
+		return View::make('configuracion/ajax/alistaproducto',
+						 [
+							 'listaproducto'   	=> $listaproducto,
+							 'idopcion'			=>	$idopcion,
+							 'ajax'    		 	=> true,
+						 ]);
+	}
+
 	public function actionListarBienProducido($idopcion)
 	{
 
@@ -981,15 +997,20 @@ class ConfiguarionController extends Controller {
 	    /******************************************************/
 	    View::share('titulo','Listar Bienes Producidos');
 
-	    $listabienproducido 			= 	$this->con_lista_bienprod();	    
-		$funcion 						= 	$this;
+
+	    $combo_activo   	=   array('' => 'Seleccione estado' , '1' => 'Activo', '0' => 'Inactivo');
+        $select_activo 		=   1;
+        $listabienproducido = 	$this->con_lista_bienprod_activo($select_activo);
+		$funcion 			= 	$this;
 
 
 		return View::make('configuracion/listabienproducidos',
 						 [
 						 	'listabienproducido' 		=> $listabienproducido,
 						 	'funcion' 					=> $funcion,
-						 	'idopcion' 					=> $idopcion,						 	
+						 	'idopcion' 					=> $idopcion,
+						 	'combo_activo' 				=> $combo_activo,
+						 	'select_activo' 			=> $select_activo						 	
 						 ]);
 	}
 	public function actionAgregarBienProducido($idopcion,Request $request)
@@ -1295,6 +1316,22 @@ class ConfiguarionController extends Controller {
 		$idproductoen								= 	Hashids::encode(substr($productogema->producto_id, -8));
 		 	return Redirect::to('/modificar-bien-producidos/'.$idopcion.'/'.$idproductoen)->with('bienhecho', 'Gema'.$productogema->gema_nombre.' quitada con exito');
 		
+	}
+
+	public function actionAjaxBienProducidoFiltro(Request $request)
+	{
+
+		$activo					=	$request['activo'];		
+		$idopcion				=	$request['idopcion'];
+
+		$listabienproducido 	= 	$this->con_lista_bienprod_activo($activo);
+
+		return View::make('configuracion/ajax/alistabienproducido',
+						 [
+							 'listabienproducido'   	=> $listabienproducido,
+							 'idopcion'					=>	$idopcion,
+							 'ajax'    		 			=> true,
+						 ]);
 	}
 
 }

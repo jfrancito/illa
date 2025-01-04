@@ -228,10 +228,10 @@ $(document).ready(function(){
         event.preventDefault();
         var finicio     = $('#finicio').val();
         var ffin        = $('#ffin').val();
-        var proveedor   = $('#proveedor_id').val();
+        var cliente     = $('#cliente_id').val();
         var estado      = $('#estado_id').val();
         var idopcion    = $('#idopcion').val();
-        
+        debugger;
         var _token      = $('#token').val();
         $(".listatablaventas").html("");
         abrircargando();
@@ -248,7 +248,7 @@ $(document).ready(function(){
                             idopcion      : idopcion,
                             finicio       : finicio,
                             ffin          : ffin,
-                            proveedor     : proveedor,
+                            cliente       : cliente,
                             estado        : estado
                         },
 

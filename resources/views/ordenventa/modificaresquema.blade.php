@@ -15,7 +15,7 @@
         <div class="panel panel-default panel-border-color panel-border-color-primary">
           <div class="panel-heading panel-heading-divider">Modificar Esquema Productos
 
-            <span class="panel-subtitle">Modificar Esquema de Productos nueva Orden Venta</span>
+            <span class="panel-subtitle">Modificar Esquema de Productos Nuevo Pedido Shopify</span>
           </div>
           <div class="panel-body">
                   <div class='formconsulta'>
