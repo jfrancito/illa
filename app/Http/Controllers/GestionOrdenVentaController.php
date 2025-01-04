@@ -299,7 +299,7 @@ class GestionOrdenVentaController extends Controller
 		$validarurl = $this->funciones->getUrl($idopcion,'Ver');
 		if($validarurl <> 'true'){return $validarurl;}
 		/******************************************************/
-		View::share('titulo','Listar Ordenes de Venta');
+		View::share('titulo','Listar Pedido Shopify');
 
 		$finicio                        =   $this->inicio;
 		$ffin                           =   $this->fin;
@@ -345,7 +345,7 @@ class GestionOrdenVentaController extends Controller
 	    if($validarurl <> 'true'){return $validarurl;}
 	    /******************************************************/
 	    $registro_id = $this->funciones->decodificarmaestra($idregistro);
-	    View::share('titulo','Resumen Orden Venta');		
+	    View::share('titulo','Resumen Pedido Shopify');		
 
 	    $refdoc_compra	    			=	ReferenciaDocumento::where('referencia_id','=',$registro_id)
 	    									->where('tipo_referencia','=','OC')
@@ -518,7 +518,7 @@ class GestionOrdenVentaController extends Controller
 		$validarurl = $this->funciones->getUrl($idopcion,'Anadir');
 		if($validarurl <> 'true'){return $validarurl;}
 		/******************************************************/
-		View::share('titulo','Agregar Ordenes de Venta');
+		View::share('titulo','Agregar Pedido Shopify');
 
 		if($_POST)
 		{
@@ -619,7 +619,7 @@ class GestionOrdenVentaController extends Controller
 	    if($validarurl <> 'true'){return $validarurl;}
 	    /******************************************************/
 	    $registro_id = $this->funciones->decodificarmaestra($idregistro);
-	    View::share('titulo','Modificar Orden Venta');
+	    View::share('titulo','Modificar Pedido Shopify');
 
 		if($_POST)
 		{
@@ -803,7 +803,7 @@ class GestionOrdenVentaController extends Controller
 		if($validarurl <> 'true'){return $validarurl;}
 		/******************************************************/
 		$registro_id = $this->funciones->decodificarmaestra($idregistro);
-		View::share('titulo','Listar Orden Venta');
+		View::share('titulo','Listar Pedido Shopify');
 		try {
 					
 					DB::beginTransaction();
@@ -927,7 +927,7 @@ class GestionOrdenVentaController extends Controller
 		if($validarurl <> 'true'){return $validarurl;}
 		/******************************************************/
 		$registro_id = $this->funciones->decodificarmaestra($idregistro);
-		View::share('titulo','Listar Orden Venta');
+		View::share('titulo','Listar Pedido Shopify');
 		try {
 					
 					DB::beginTransaction();
@@ -960,7 +960,7 @@ class GestionOrdenVentaController extends Controller
 		if($validarurl <> 'true'){return $validarurl;}
 		/******************************************************/
 		$registro_id = $this->funciones->decodificarmaestra($idregistro);
-		View::share('titulo','Modificar Orden Venta');
+		View::share('titulo','Modificar Pedido Shopify');
 
 
 		/******************************/
@@ -1021,7 +1021,7 @@ class GestionOrdenVentaController extends Controller
 		if($validarurl <> 'true'){return $validarurl;}
 		/******************************************************/
 		$registro_id = $this->funciones->decodificarmaestra($idregistro);
-		View::share('titulo','Margen Orden Venta');
+		View::share('titulo','Margen Pedido Shopify');
 
 
 		/******************************/
@@ -1070,7 +1070,7 @@ class GestionOrdenVentaController extends Controller
 
 	public function actionOrdenVentaModificarMargenProductos($idopcion,$idordenventa,Request $request)
 	{
-		View::share('titulo','Agregar Margen Orden de Venta');
+		View::share('titulo','Agregar Margen Pedido Shopify');
 		if($_POST)
 		{
 			
@@ -1307,7 +1307,7 @@ class GestionOrdenVentaController extends Controller
 		if($validarurl <> 'true'){return $validarurl;}
 		/******************************************************/
 		$registro_id = $this->funciones->decodificarmaestra($idregistro);
-		View::share('titulo','Facturar Orden Venta');
+		View::share('titulo','Facturar Pedido Shopify');
 
 		/******************************/	
 
@@ -1591,7 +1591,7 @@ class GestionOrdenVentaController extends Controller
 		if($validarurl <> 'true'){return $validarurl;}
 		/******************************************************/
 		$registro_id = $this->funciones->decodificarmaestra($idregistro);
-		View::share('titulo','Comprar Orden Venta');
+		View::share('titulo','Comprar Pedido Shopify');
 
 		/******************************/	
 

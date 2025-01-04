@@ -13,9 +13,9 @@
     <div class="row">
       <div class="col-md-12">
         <div class="panel panel-default panel-border-color panel-border-color-primary">
-          <div class="panel-heading panel-heading-divider">Margen Orden Venta
+          <div class="panel-heading panel-heading-divider">Margen Pedido Shopify
 
-            <span class="panel-subtitle">Margen Orden Venta</span>
+            <span class="panel-subtitle">Margen Pedido Shopify</span>
           </div>
           <div class="panel-body">
                   <div class='formconsulta'>

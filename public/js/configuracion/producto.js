@@ -117,6 +117,44 @@ $(document).ready(function(){
                   "modal-producto-gema","modal-producto-gema-container");
 
   });
+
+  $(".listaproducto").on('click','.buscarlistaproducto', function() {
+		
+		event.preventDefault();		
+		debugger;
+		var activo      = $('#activo').val();
+		var idopcion    = $('#idopcion').val();
+		
+		var _token      = $('#token').val();
+		$(".listatablaproductos").html("");
+		abrircargando();
+		
+		$(".menu-roles li").removeClass( "active" )
+		$(this).parents('li').addClass("active");
+
+		$.ajax({
+			
+			type    :   "POST",
+			url     :   carpeta+"/ajax-gestion-de-productos-filtro",
+			data    :   {
+							_token        : _token,
+							idopcion      : idopcion,
+							activo       	: activo							
+						},
+
+			success: function (data) {
+				cerrarcargando();
+				
+				$(".listatablaproductos").html(data);
+
+			},
+			error: function (data) {
+				cerrarcargando();
+				console.log('Error:', data);
+			}
+		});
+	});
+	
   click_boton_categoria();
   function click_boton_categoria(){
   		var categoriaproducto		=	$('#categoria_id').select2('data');
@@ -150,4 +188,18 @@ $(document).ready(function(){
       return true;
 
   });
+
+  $(".producto").on('click','.btnguardarproducto', function() {
+        event.preventDefault()
+       
+        var unidad_medida_id     		=   $('#unidad_medida_id').val();        
+        var categoria_id     				=   $('#categoria_id').val();        
+        var formclass               =   'formagregarproducto';
+debugger;
+        if(unidad_medida_id =='' && categoria_id == 'CATP00000001'){ alerterrorajax("Ingrese Unidad de Medida."); return false;}
+
+        $('.'+formclass).submit();
+        return true;
+
+    });
 });

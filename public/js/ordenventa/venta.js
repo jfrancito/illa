@@ -224,7 +224,7 @@ $(document).ready(function(){
     });
 
     $(".listaventa").on('click','.buscarlistaventa', function() {
-        
+        debugger;
         event.preventDefault();
         var finicio     = $('#finicio').val();
         var ffin        = $('#ffin').val();

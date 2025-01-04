@@ -80,7 +80,7 @@
                 </div>
                 <div class="col-xs-6">
                   <p class="text-right">
-                    <a href="{{ url('/gestion-de-grupoopciones/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger">Cancelar</button></a>
+                    <a href="{{ url('/gestion-grupo-opciones/'.$idopcion) }}"><button type="button" class="btn btn-space btn-danger">Cancelar</button></a>
                     <button type="submit" class="btn btn-space btn-primary">Guardar</button>
                   </p>
                 </div>

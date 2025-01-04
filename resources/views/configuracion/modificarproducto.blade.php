@@ -9,7 +9,6 @@
 
 <div class="be-content producto">
   <div class="main-content container-fluid">
-
     <!--Basic forms-->
     <div class="row">
       <div class="col-md-12">

@@ -8,7 +8,7 @@
 @stop
 @section('section')
 
-  <div class="be-content contenido asientomodelo">
+  <div class="be-content contenido listaproducto">
     <div class="main-content container-fluid">
           <div class="row">
             <div class="col-sm-12">
@@ -20,7 +20,10 @@
                       <span class="tooltiptext">Crear Producto</span>
                       <span class="icon mdi mdi-plus-circle-o"></span>
                     </a>
-
+                    <a href="#" class="tooltipcss buscarlistaproducto">
+                      <span class="tooltiptext">Buscar</span>
+                      <span class="icon mdi mdi-search"></span>
+                    </a>
                   </div>
                 </div>
 
@@ -28,23 +31,33 @@
                   <div class='filtrotabla row'>
 
                     <div class="col-xs-12">
+
                       <input type="hidden" name="idopcion" id='idopcion' value='{{$idopcion}}'>
-                    </div>
 
-                    <div class="col-xs-12 widget-chart-container">
-                      <div class="widget-chart-info">
-                        <ul class="chart-legend-horizontal">
-                          <li><span class="main-chart-color1"></span> Activo</li>
-                          <li><span class="main-chart-color2"></span> Inactivo</li>
-                        </ul>
+                      <div class="col-xs-12 col-sm-5 col-md-4 col-lg-3">
+                        <div class="form-group">
+                          <label class="control-label" style="padding-left: 16px;">Estado</label>
+                          <div class="col-sm-12">
+                            {!! Form::select( 'activo', $combo_activo, $select_activo,
+                                              [
+                                                'class'       => 'form-control control input-sm select2' ,
+                                                'id'          => 'activo',
+                                                'required'    => '',         
+                                                'data-aw'     => '4'
+                                              ]) !!}
+
+                            @include('error.erroresvalidate', [ 'id' => $errors->has('activo')  , 
+                                                                'error' => $errors->first('activo', ':message') , 
+                                                                'data' => '4'])
+                          </div>
+                        </div>
                       </div>
+
                     </div>
-
-
                   </div>
 
 
-                  <div class='listajax'>
+                  <div class='listatablaproductos listajax'>
                     @include('configuracion.ajax.alistaproducto')
                   </div>
 

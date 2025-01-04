@@ -7,7 +7,7 @@
 @stop
 @section('section')
 
-<div class="be-content">
+<div class="be-content producto">
   <div class="main-content container-fluid">
     <!--Basic forms-->
     <div class="row">

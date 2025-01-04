@@ -102,13 +102,13 @@ class VentaController extends Controller {
 						 ]);
 	}
 
-	public function actionAjaxListarVentassEntreFechas(Request $request)
+	public function actionAjaxListarVentasEntreFechas(Request $request)
 	{
 
 		$idopcion 		=	$request['idopcion'];		
 		$finicio 		=  	date_format(date_create($request['finicio']), 'd-m-Y');
 		$ffin 			=  	date_format(date_create($request['ffin']), 'd-m-Y');
-		$cliente_id	=	$request['cliente'];		
+		$cliente_id		=	$request['cliente'];		
 		$estado_id		=	$request['estado'];				
 
 		$listacompra 	= 	Venta::where('fecha','>=', $finicio)

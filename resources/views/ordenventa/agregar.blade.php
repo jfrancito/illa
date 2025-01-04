@@ -13,9 +13,9 @@
     <div class="row">
       <div class="col-md-12">
         <div class="panel panel-default panel-border-color panel-border-color-primary">
-          <div class="panel-heading panel-heading-divider">Agregar Orden Venta
+          <div class="panel-heading panel-heading-divider">Agregar Pedido Shopify
 
-            <span class="panel-subtitle">Crear un nueva Orden Venta</span>
+            <span class="panel-subtitle">Crear un nuevo Pedido Shopify</span>
           </div>
           <div class="panel-body">
             <form method="POST" action="{{ url('/agregar-orden-ventas/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">

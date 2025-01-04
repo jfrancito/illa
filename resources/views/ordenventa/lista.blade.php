@@ -13,11 +13,11 @@
           <div class="row">
             <div class="col-sm-12">
               <div class="panel panel-default panel-border-color panel-border-color-success">
-                <div class="panel-heading">Lista de Ordenes Ventas
+                <div class="panel-heading">Lista de Pedidos Shopify
                   <div class="tools tooltiptop">
 
                     <a href="{{ url('/agregar-orden-ventas/'.$idopcion) }}" class="tooltipcss">
-                      <span class="tooltiptext">Crear Orden Venta</span>
+                      <span class="tooltiptext">Crear Pedido Shopify</span>
                       <span class="icon mdi mdi-plus-circle-o"></span>
                     </a>                    
                     <a href="#" class="tooltipcss buscarlistaventa">

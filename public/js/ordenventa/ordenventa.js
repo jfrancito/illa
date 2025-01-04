@@ -29,10 +29,10 @@ $(document).ready(function(){
 	    
 	    $.confirm({
 	        title: '¿Confirma la Validación?',
-	        content: 'Confirmar Valicación de Orden de Venta ' + codigo,
+	        content: 'Confirmar Valicación de Pedido Shopify ' + codigo,
 	        buttons: {
 	            confirmar: function () {
-	                abrircargando('VALIDANDO ORDEN DE VENTA'); // Muestra el cargando
+	                abrircargando('VALIDANDO PEDIDO SHOPIFY'); // Muestra el cargando
 	                window.location.href = href; // Redirige a la URL original
 	            },
 	            cancelar: function () {
@@ -52,10 +52,10 @@ $(document).ready(function(){
 	    
 	    $.confirm({
 	        title: '¿Confirma la Aprobación?',
-	        content: 'Confirmar Aprobación de Orden de Venta ' + codigo,
+	        content: 'Confirmar Aprobación de Pedido Shopify ' + codigo,
 	        buttons: {
 	            confirmar: function () {
-	                abrircargando('APROBANDO ORDEN DE VENTA'); // Muestra el cargando
+	                abrircargando('APROBANDO PEDIDO SHOPIFY'); // Muestra el cargando
 	                window.location.href = href; // Redirige a la URL original
 	            },
 	            cancelar: function () {
@@ -320,7 +320,7 @@ $(document).ready(function(){
 		event.preventDefault();
 		var finicio     = $('#finicio').val();
 		var ffin        = $('#ffin').val();
-		var cliente   = $('#cliente_id').val();
+		var cliente   	= $('#cliente_id').val();
 		var estado      = $('#estado_id').val();
 		var idopcion    = $('#idopcion').val();
 		
@@ -368,7 +368,7 @@ $(document).ready(function(){
         var data_orden_venta_id          	=   $(this).attr('data_orden_venta_id');
         var ov_estado_id      				=   $(this).attr('data_orden_venta_estado_id');		
 		
-		if(ov_estado_id !='1CIX00000003'){ alerterrorajax("No puede modificar una Orden de Venta en estado Emitido."); return false;}	
+		if(ov_estado_id !='1CIX00000003'){ alerterrorajax("No puede modificar un Pedido Shopify en estado Emitido."); return false;}	
      
         data    =   {
                         _token                      : _token,
@@ -423,7 +423,7 @@ $(document).ready(function(){
         var data_orden_venta_id          	=   $(this).attr('data_orden_venta_id');        
         var ov_estado_id      				=   $(this).attr('data_orden_venta_estado_id');		
 		
-		if(ov_estado_id !='1CIX00000003'){ alerterrorajax("No puede modificar una Orden de Venta en estado Emitido."); return false;}	
+		if(ov_estado_id !='1CIX00000003'){ alerterrorajax("No puede modificar un Pedido Shopify en estado Emitido."); return false;}	
      
         data    =   {
                         _token                      : _token,
@@ -478,7 +478,7 @@ $(document).ready(function(){
         var data_orden_venta_id          	=   $(this).attr('data_orden_venta_id');        
         var ov_estado_id      				=   $(this).attr('data_orden_venta_estado_id');		
 		
-		if(ov_estado_id !='1CIX00000003'){ alerterrorajax("No puede modificar una Orden de Venta en estado Emitido."); return false;}	
+		if(ov_estado_id !='1CIX00000003'){ alerterrorajax("No puede modificar un Pedido Shopify en estado Emitido."); return false;}	
      
         data    =   {
                         _token                      : _token,
