@@ -21,7 +21,7 @@
 
 
   <div class="form-group">
-    <label class="col-sm-3 control-label">DNI / RUC <span class="obligatorio">(*)</span> :</label>
+    <label class="col-sm-3 control-label">Numero Documento :</label>
     <div class="col-sm-6">
 
         <input  type="text"
@@ -30,8 +30,7 @@
                 value="{{ old('numerodocumento') }}"
                 data-parsley-type="number"
                 data-parsley-length="[8,11]"
-                placeholder="DNI o RUC"
-                required = ""
+                placeholder="Numero Documento"                
                 autocomplete="off" class="form-control input-sm" data-aw="2"
                 @if($disablenumerodocumento) disabled @endif/>
 
@@ -43,14 +42,14 @@
   </div>
 
   <div class="form-group">
-    <label class="col-sm-3 control-label">Nombres / Razon Social <span class="obligatorio">(*)</span> :</label>
+    <label class="col-sm-3 control-label">Nombre <span class="obligatorio">(*)</span> :</label>
     <div class="col-sm-6">
 
         <input  type="text"
                 id="nombre_razonsocial" name='nombre_razonsocial' 
                 value="@if(isset($cliente)){{old('nombre_razonsocial' ,$cliente->nombre_razonsocial)}}@else{{old('nombre_razonsocial')}}@endif"
                 value="{{ old('nombre_razonsocial') }}" 
-                placeholder="Nombres o  Razon Social"
+                placeholder="Nombre"
                 required = ""
                 autocomplete="off" class="form-control input-sm" data-aw="3"/>
 
@@ -60,9 +59,29 @@
 
     </div>
   </div>
+
+  <div class="form-group">
+    <label class="col-sm-3 control-label">Pais <span class="obligatorio">(*)</span> :</label>
+    <div class="col-sm-6">
+      {!! Form::select( 'pais_id', $combo_paises, $select_pais,
+                        [
+                          'class'       => 'select2 form-control control input-xs' ,
+                          'id'          => 'pais_id',
+                          'required'    => '',
+                          'disabled'    => false,
+                          'data-aw'     => '4'
+                        ]) !!}
+
+        @include('error.erroresvalidate', [ 'id' => $errors->has('pais_id')  , 
+                                            'error' => $errors->first('pais_id', ':message') , 
+                                            'data' => '4'])
+
+    </div>
+  </div>
+
   <div class="ajaxubigeo">
     <div class="form-group ajaxdepartamento">
-      <label class="col-sm-3 control-label">Departamento <span class="obligatorio">(*)</span> :</label>
+      <label class="col-sm-3 control-label">Departamento :</label>
       <div class="col-sm-6">
         {!! Form::select( 'departamento_id', $combo_departamentos, $select_departamento,
                           [
@@ -80,7 +99,7 @@
     </div>
 
     <div class="form-group ajaxprovincia">
-      <label class="col-sm-3 control-label">Provincia<span class="obligatorio">(*)</span> :</label>
+      <label class="col-sm-3 control-label">Provincia :</label>
       <div class="col-sm-6">
         {!! Form::select( 'provincia_id', $combo_provincias, $select_provincia,
                           [
@@ -98,7 +117,7 @@
     </div>
 
     <div class="form-group ajaxdistrito">
-      <label class="col-sm-3 control-label">Distritos <span class="obligatorio">(*)</span> :</label>
+      <label class="col-sm-3 control-label">Distritos :</label>
       <div class="col-sm-6">
         {!! Form::select( 'distrito_id', $combo_distritos, $select_distrito,
                           [
@@ -117,15 +136,14 @@
   </div>
 
   <div class="form-group">
-    <label class="col-sm-3 control-label">Direccion <span class="obligatorio">(*)</span> :</label>
+    <label class="col-sm-3 control-label">Direccion :</label>
     <div class="col-sm-6">
 
         <input  type="text"
                 id="direccion" name='direccion' 
                 value="@if(isset($cliente)){{old('direccion' ,$cliente->direccion)}}@else{{old('direccion')}}@endif"
                 value="{{ old('direccion') }}" 
-                placeholder="Direccion"
-                required = ""
+                placeholder="Direccion"                
                 autocomplete="off" class="form-control input-sm" data-aw="4"/>
 
         @include('error.erroresvalidate', [ 'id' => $errors->has('direccion')  , 

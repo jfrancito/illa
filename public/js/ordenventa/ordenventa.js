@@ -548,4 +548,21 @@ $(document).ready(function(){
 	});
 
 
+    $(".formconsulta").on('click','.agregacliente', function() {
+        debugger;
+        var _token                  =   $('#token').val();          
+		var idopcion                =   $('#idopcion').val();      
+
+        data                        =   {
+                                            _token      : _token,											
+											idopcion 	: idopcion
+                                        };
+                                        
+        ajax_modal(data,"/ajax-modal-agregar-cliente",
+                  "modal-agregar-cliente","modal-agregar-cliente-container");
+
+    });
+
+
+
 });

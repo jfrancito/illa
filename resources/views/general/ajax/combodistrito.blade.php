@@ -1,11 +1,10 @@
 
-  <label class="col-sm-3 control-label">Distritos <span class="obligatorio">(*)</span> :</label>
+  <label class="col-sm-3 control-label">Distritos :</label>
   <div class="col-sm-6">
     {!! Form::select( 'distrito_id', $combodistrito, $select_distrito,
                       [
                         'class'       => 'select2 form-control control input-xs' ,
-                        'id'          => 'distrito_id',
-                        'required'    => '',
+                        'id'          => 'distrito_id',                        
                         'disabled'    => false,
                         'data-aw'     => '6'
                       ]) !!}

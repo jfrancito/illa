@@ -690,6 +690,33 @@ class GestionOrdenVentaController extends Controller
 						 ]);
 	}
 
+	public function actionAjaxModalAgregarCliente(Request $request)
+	{		
+		$idopcion 	 = 	$request['idopcion'];
+
+		$select_tipo_documento  =	'1CIX00000033';
+	    $combo_tipo_documento 	=	$this->gn_combo_categoria('TIPO_DOCUMENTO','Seleccione tipo documento','');
+
+	    $select_pais	=	'';
+	    $combo_paises 	=	$this->gn_combo_paises();		
+
+	    $disabletipodocumento  	=	false;
+	    $disablenumerodocumento =	false;
+				
+		return View::make('ordenventa/modal/ajax/maagregarcliente',
+						 [							 	
+						 	'idopcion' 					=> $idopcion,
+						 	'select_tipo_documento'  	=>  $select_tipo_documento,
+							'combo_tipo_documento'   	=>  $combo_tipo_documento,
+							'disabletipodocumento'   	=>  $disabletipodocumento,
+							'disablenumerodocumento' 	=>  $disablenumerodocumento,
+							'combo_paises'				=>	$combo_paises,
+							'select_pais'  				=>  $select_pais,
+						 	'ajax' 						=> true,						 	
+						 ]);
+	}
+
+
 	public function actionAgregarDetalleOrdenVentas($idopcion,$idregistro,Request $request)
 	{
 		/******************* validar url **********************/
@@ -1883,6 +1910,35 @@ class GestionOrdenVentaController extends Controller
 		}
 	}
 
+	public function actionAjaxAgregarCliente($idopcion,Request $request)
+	{
+		$tipo_documento_id 	 		= 	$request['tipo_documento_id'];			
+		if($tipo_documento_id == '1CIX00000033'){
+			$sindocumento 	 		= 	1;
+		}else{
+			$sindocumento 	 		= 	0;
+		}		
+		
+		$nombre_razonsocial 	 	= 	$request['nombre_razonsocial'];
+		$direccion 	 		 		= 	$request['direccion'];		
+		$pais_id 	 				= 	$request['pais_id'];
 
+		$tipo_documento 			= 	Categoria::where('id','=',$tipo_documento_id)->first();
 
+		$idcliente 					=   $this->funciones->getCreateIdMaestra('clientes');
+		
+		$cabecera            	 			=	new Cliente;
+		$cabecera->id 	     	 			=   $idcliente;
+		$cabecera->tipo_documento_id		=   $tipo_documento->id;
+		$cabecera->tipo_documento_nombre 	=   $tipo_documento->descripcion;		
+		$cabecera->sindocumento 			=   $sindocumento;
+		$cabecera->nombre_razonsocial 	   	=   $nombre_razonsocial;
+		$cabecera->pais_id 					=	$pais_id;		
+		$cabecera->direccion 	   			=   $direccion;		
+		$cabecera->fecha_crea 	 			=   $this->fechaactual;
+		$cabecera->usuario_crea 			=   Session::get('usuario')->id;
+		$cabecera->save();
+
+ 		return Redirect::to('/agregar-orden-ventas/'.$idopcion)->with('bienhecho', 'Cliente '.$nombre_razonsocial.' registrado con exito');
+	}
 }
