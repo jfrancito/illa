@@ -164,6 +164,16 @@ trait GeneralesTraits
 		return [''=>'SELECCIONE DEPARTAMENTO']+$datos;
 	}
 
+	private function gn_combo_paises()
+	{
+		$datos =	[];
+		$datos = 	DB::table('paises')
+						->where('activo',1)
+						->pluck('descripcion','id')
+						->toArray();
+		return [''=>'SELECCIONE PAIS']+$datos;
+	}
+
 	private function gn_generacion_combo_tabla($tabla,$atributo1,$atributo2,$titulo,$todo,$tipoestado) {
 		
 		$array 							= 	DB::table($tabla)

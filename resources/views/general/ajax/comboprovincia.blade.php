@@ -1,10 +1,9 @@
- <label class="col-sm-3 control-label">Provincia<span class="obligatorio">(**)</span> :</label>
+ <label class="col-sm-3 control-label">Provincia :</label>
   <div class="col-sm-6">
     {!! Form::select( 'provincia_id', $comboprovincia,$select_provincia,
                       [
                         'class'       => 'select2 form-control control input-xs' ,
-                        'id'          => 'provincia_id',
-                        'required'    => '',
+                        'id'          => 'provincia_id',                        
                         'disabled'    => false,
                         'data-aw'     => '5'
                       ]) !!}

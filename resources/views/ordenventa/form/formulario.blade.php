@@ -48,7 +48,7 @@
 							</div>
 
 							<span class="input-group-btn">
-								<a href="{{ url('/agregar-clientes/oj') }}" target="_blank">
+								<a href="#" class="agregacliente"">
 									<button type="button" class="btn btn-primary" style="margin-left: -15px; height: 36px">
 										<i class="icon mdi mdi-collection-plus"></i>
 									</button>
@@ -143,7 +143,7 @@
 							</div>
 
 							<span class="input-group-btn">
-								<a href="{{ url('/agregar-clientes/oj') }}" target="_blank">
+								<a href="#">
 									<button type="button" class="btn btn-primary" style="margin-left: -15px; height: 36px">
 										<i class="icon mdi mdi-collection-plus"></i>
 									</button>

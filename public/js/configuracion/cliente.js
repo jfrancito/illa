@@ -11,7 +11,7 @@ $(document).ready(function(){
             tipo_documento_id   =   tipodocumento[0].id;
             cadtipodocumento    =   tipodocumento[0].text;
         }
-        if(cadtipodocumento=='SIN DOC'){
+        if(cadtipodocumento=='OTROS DOC'){
             // alerterror505ajax(cadtipodocumento);
             var _token      = $('#token').val();
             // alerterrorajax('DEBE SELECCIONAR UN LOTE PARA CLONAR');
@@ -89,6 +89,46 @@ $(document).ready(function(){
             }
         });
     });
+    cargar_ndoc_cliente_sin_documentos();
+    function cargar_ndoc_cliente_sin_documentos(){
+        debugger;
+        var operacion = $('#operacion').val();
+        var tipodocumento = $('#tipo_documento_id').select2('data');
+        var tipo_documento_id = $('#tipo_documento_id').val();
+        var cadtipodocumento  =   '';
+        if(tipodocumento){
+            tipo_documento_id   =   tipodocumento[0].id;
+            cadtipodocumento    =   tipodocumento[0].text;
+        }
+        if(operacion=='nuevo'){
+            if(cadtipodocumento=='OTROS DOC'){
+                // alerterror505ajax(cadtipodocumento);
+                var _token      = $('#token').val();
+                // alerterrorajax('DEBE SELECCIONAR UN LOTE PARA CLONAR');
+                // return false;
+                $.ajax({
+                
+                    type    :   "POST",
+                    url     :   carpeta+"/ajax-cargar-ndoc-cliente-sin-documentos",
+                    data    :   {
+                                    _token  : _token
+                                    // tipo_documento_id : tipo_documento_id
+                                },
+                    success: function (data) {
+                        $(".formcliente #numerodocumento").val(data);
+                    },
+                    error: function (data) {
 
+                        console.log('Error:', data);
+                    }
+                });
+                $(".formcliente #sindocumento").val(1); 
+            }
+            else{
+                $(".formcliente #numerodocumento").val('');
+                $(".formcliente #sindocumento").val(0);
+            }        
 
+        }        
+    }
 });

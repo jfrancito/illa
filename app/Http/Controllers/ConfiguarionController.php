@@ -248,18 +248,24 @@ class ConfiguarionController extends Controller {
 		View::share('titulo','Agregar Clientes');
 		if($_POST)
 		{
-			$this->validate($request, [
-	            'numerodocumento' => 'unique:clientes',
-			], [
-            	'numerodocumento.unique' => 'Cliente ya Registrado',
-        	]);
 
-			$tipo_documento_id 	 		= 	$request['tipo_documento_id'];
 			$numerodocumento 	 		= 	$request['numerodocumento'];
+
+			if(isset($numerodocumento)){
+				$this->validate($request, [
+		            'numerodocumento' => 'unique:clientes',
+				], [
+	            	'numerodocumento.unique' => 'Cliente ya Registrado',
+	        	]);
+
+			}			
+
+			$tipo_documento_id 	 		= 	$request['tipo_documento_id'];			
 			$nombre_razonsocial 	 	= 	$request['nombre_razonsocial'];
 			$direccion 	 		 		= 	$request['direccion'];
 			$correo 	 		 		= 	$request['correo'];
 			$celular 	 		 		= 	$request['celular'];
+			$pais_id 	 				= 	$request['pais_id'];
 			$departamento_id 	 		= 	$request['departamento_id'];
 			$provincia_id 	 		 	= 	$request['provincia_id'];
 			$distrito_id 	 		 	= 	$request['distrito_id'];
@@ -277,6 +283,7 @@ class ConfiguarionController extends Controller {
 			$cabecera->numerodocumento 			=   $numerodocumento;
 			$cabecera->sindocumento 			=   $sindocumento;
 			$cabecera->nombre_razonsocial 	   	=   $nombre_razonsocial;
+			$cabecera->pais_id 					=	$pais_id;
 			$cabecera->departamento_id 			=	$departamento_id;
 			$cabecera->provincia_id 			=	$provincia_id;
 			$cabecera->distrito_id 				=	$distrito_id;
@@ -291,8 +298,11 @@ class ConfiguarionController extends Controller {
 
 		}else{
 
-		    $select_tipo_documento  =	'';
+		    $select_tipo_documento  =	'1CIX00000033';
 		    $combo_tipo_documento 	=	$this->gn_combo_categoria('TIPO_DOCUMENTO','Seleccione tipo documento','');
+
+		    $select_pais	=	'';
+		    $combo_paises 	=	$this->gn_combo_paises();
 
 			$select_departamento	=	'';
 		    $combo_departamentos 	=	$this->gn_combo_departamentos();
@@ -312,15 +322,18 @@ class ConfiguarionController extends Controller {
 							'combo_tipo_documento'   	=>  $combo_tipo_documento,
 							'disabletipodocumento'   	=>  $disabletipodocumento,
 							'disablenumerodocumento' 	=>  $disablenumerodocumento,
+
+							'combo_paises'				=>	$combo_paises,
+							'select_pais'  				=>  $select_pais,
 							
 							'combo_departamentos'		=>	$combo_departamentos,
-							'select_departamento'  	=>  $select_departamento,
+							'select_departamento'  		=>  $select_departamento,
 
 							'combo_provincias'			=>	$combo_provincias,
-							'select_provincia'  	=>  $select_provincia,
+							'select_provincia'  		=>  $select_provincia,
 							
 							'combo_distritos'			=>	$combo_distritos,
-							'select_distrito'  	=>  $select_distrito,
+							'select_distrito'  			=>  $select_distrito,
 						  	
 						  	'idopcion'  			 	=>	$idopcion
 						]);
@@ -346,6 +359,7 @@ class ConfiguarionController extends Controller {
 			$celular 	 		 				= 	$request['celular'];
 			$activo 	 		 				= 	$request['activo'];
 			
+			$pais_id 	 		 				= 	$request['pais_id'];
 			$departamento_id 	 		 		= 	$request['departamento_id'];
 			$provincia_id 	 		 			= 	$request['provincia_id'];
 			$distrito_id 	 		 			= 	$request['distrito_id'];
@@ -356,6 +370,7 @@ class ConfiguarionController extends Controller {
 			$cabecera->direccion 	   			=   $direccion;
 			$cabecera->correo 					=   $correo;
 			$cabecera->celular 					=   $celular;
+			$cabecera->pais_id 					=	$pais_id;
 			$cabecera->departamento_id 			=	$departamento_id;
 			$cabecera->provincia_id 			=	$provincia_id;
 			$cabecera->distrito_id 				=	$distrito_id;
@@ -375,10 +390,12 @@ class ConfiguarionController extends Controller {
 		    $disabletipodocumento  		=	true;
 		    $disablenumerodocumento 	=	true;
 
+		    $combo_paises 				=	$this->gn_combo_paises();
 		    $combo_departamentos 		=	$this->gn_combo_departamentos();
 		    $combo_provincias 			=	$this->gn_combo_provincias($cliente->departamento_id);
 		    $combo_distritos 			=	$this->gn_combo_distritos($cliente->provincia_id);
 
+		    $select_pais 				=	$cliente->pais_id;
 			$select_departamento 		= 	$cliente->departamento_id;
 			$select_provincia 			= 	$cliente->provincia_id;
 			$select_distrito 			= 	$cliente->distrito_id;
@@ -392,10 +409,12 @@ class ConfiguarionController extends Controller {
 								'disabletipodocumento'   	=> $disabletipodocumento,
 								'disablenumerodocumento' 	=> $disablenumerodocumento,
 
+								'combo_paises'				=>	$combo_paises,
 								'combo_departamentos'		=>	$combo_departamentos,
 								'combo_provincias'			=>	$combo_provincias,
 								'combo_distritos'			=>	$combo_distritos,
 
+								'select_pais'				=>	$select_pais,
 								'select_departamento'		=>	$select_departamento,
 								'select_provincia'			=>	$select_provincia,
 								'select_distrito'			=>	$select_distrito,

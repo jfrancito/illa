@@ -15,6 +15,7 @@
         <div class="panel panel-default panel-border-color panel-border-color-primary">
           <div class="panel-heading panel-heading-divider">Agregar Cliente<span class="panel-subtitle">Crear un nuevo cliente</span></div>
           <div class="panel-body">
+            <input type="hidden" name="operacion" id='operacion' value='nuevo'>
             <form method="POST" action="{{ url('/agregar-clientes/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                   {{ csrf_field() }}
               @include('configuracion.form.fcliente')
@@ -44,11 +45,12 @@
 
     <script type="text/javascript">
       $(document).ready(function(){
-        //initialize the javascript
+        //initialize the javascript                
         App.init();
         App.formElements();
         $('form').parsley();
-      });
+
+      });      
     </script> 
 
     <script src="{{ asset('public/js/configuracion/cliente.js?v='.$version) }}" type="text/javascript"></script>

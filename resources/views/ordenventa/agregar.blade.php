@@ -7,16 +7,16 @@
 
 @stop
 @section('section')
-<div class="be-content venta">
+<div class="be-content venta ordenventa">
   <div class="main-content container-fluid">
     <!--Basic forms-->
     <div class="row">
       <div class="col-md-12">
         <div class="panel panel-default panel-border-color panel-border-color-primary">
           <div class="panel-heading panel-heading-divider">Agregar Pedido Shopify
-
             <span class="panel-subtitle">Crear un nuevo Pedido Shopify</span>
           </div>
+          <input type="hidden" name="idopcion" id='idopcion' value='{{$idopcion}}'>
           <div class="panel-body">
             <form method="POST" action="{{ url('/agregar-orden-ventas/'.$idopcion) }}" style="border-radius: 0px;" class="form-horizontal group-border-dashed">
                   {{ csrf_field() }}
@@ -28,8 +28,8 @@
         </div>
       </div>
     </div>
-  </div>
-  {{-- @include('venta.modal.mdetalleventa') --}}
+  </div>  
+  @include('ordenventa.modal.magregarcliente')
 </div>  
 @stop
 @section('script')
@@ -76,6 +76,6 @@
       });
     </script> 
 
-    <script src="{{ asset('public/js/venta/venta.js?v='.$version) }}" type="text/javascript"></script>
+    <script src="{{ asset('public/js/ordenventa/ordenventa.js?v='.$version) }}" type="text/javascript"></script>
 
 @stop

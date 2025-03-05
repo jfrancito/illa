@@ -35,7 +35,7 @@
       </div>
     </div>
   </div>
-  @include('ordenventa.modal.mdetalleregistro')
+  @include('ordenventa.modal.mdetalleregistro')  
 </div>  
 
 
@@ -67,7 +67,6 @@
         closeSelector: '.modal-close',
         classAddAfterOpen: 'modal-show',
       });
-
 
       $(document).ready(function(){
         //initialize the javascript

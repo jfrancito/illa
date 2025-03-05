@@ -333,7 +333,9 @@ Route::group(['middleware' => ['authaw']], function () {
 	Route::any('/agregar-orden-ventas/{idopcion}', 'GestionOrdenVentaController@actionAgregarOrdenesVenta');
 	Route::any('/modificar-orden-ventas/{idopcion}/{idregistro}', 'GestionOrdenVentaController@actionModificarOrdenesVenta');
 	Route::any('/ajax-modal-detalle-orden-venta', 'GestionOrdenVentaController@actionAjaxModalDetalleOrdenVenta');
+	Route::any('/ajax-modal-agregar-cliente', 'GestionOrdenVentaController@actionAjaxModalAgregarCliente');
 	Route::any('/guardar-detalle-orden-ventas/{idopcion}/{idregistro}', 'GestionOrdenVentaController@actionAgregarDetalleOrdenVentas');
+	Route::any('/ajax-agregar-clientes/{idopcion}', 'GestionOrdenVentaController@actionAjaxAgregarCliente');
 	Route::any('/ajax-gestion-de-orden-ventas-entrefechas', 'GestionOrdenVentaController@actionAjaxOrdenVentaEntreFechas');
 	Route::any('/ajax-actualizar-envio-orden-venta', 'GestionOrdenVentaController@actionAjaxActualizarEnvioOrdenVenta');
 	Route::any('/ajax-actualizar-descuento-orden-venta', 'GestionOrdenVentaController@actionAjaxActualizarDescuentoOrdenVenta');
